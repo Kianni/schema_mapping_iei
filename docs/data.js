@@ -91,6 +91,420 @@ window.IEI_DATA = {
           { tema: "Información sin representación global", prioridad: "Media", evidencia: "Campos relevantes sin destino: entidad, leyenda, tipo_centro, f_resolu, max, comarca y pobtotal.", decision: "Confirmar que su pérdida es intencional o ampliar el esquema global antes de implementar." },
           { tema: "Código postal y URL", prioridad: "Baja", evidencia: "El modelo global contiene codigo_postal y URL, pero esta fuente no dispone de esos campos.", decision: "Dejar nulos para esta fuente salvo que se acuerde enriquecimiento desde otra fuente autorizada." }
         ]
-      }
+      },
+    {
+      "id": "canarias",
+      "nombre": "Canarias",
+      "archivo": "datos-abiertos-csv-segundo-trimestre26.json",
+      "registros": 810,
+      "campos": 20,
+      "resumen": [
+        "810 filas, 20 campos, 745 NIF y 749 números de registro; las filas no son organizaciones únicas.",
+        "4 NIF tienen dos registros; algunas organizaciones tienen varias direcciones. Acordar granularidad con Valencia, que describe centros.",
+        "16 NIF tienen varias áreas; 33 grupos NIF–área tienen varias subáreas conocidas.",
+        "7 códigos municipales en 8 filas no tienen nombre ni provincia conocidos; codificación municipal no verificada.",
+        "Contactos, webs y componentes de dirección requieren limpieza. No hay código postal, coordenadas ni descripción libre identificados."
+      ],
+      "mapeoGlobal": [
+        {
+          "objeto": "Entidad",
+          "campo": "cod_entidad",
+          "origen": "nif / numero_registro",
+          "estado": "Revisar modelo",
+          "regla": "NIF es candidato si Entidad representa una organización. Acordar identidad global y conservar registro para trazabilidad; no equiparar organizaciones y centros automáticamente.",
+          "nota": "745 NIF, 749 registros; 4 NIF con dos registros. Valencia describe centros."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "nombre",
+          "origen": "denominacion",
+          "estado": "Directo",
+          "regla": "Conservar original; revisar posibles truncamientos sin inventar texto.",
+          "nota": "745 nombres; uno-a-uno con NIF en esta fuente; finales sospechosos confirmados en JSON."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "ambito",
+          "origen": "area_nombre + subarea_nombre",
+          "estado": "Revisar modelo",
+          "regla": "Mapear categorías explícitas al enum; revisar categorías mixtas y conservar varios ámbitos.",
+          "nota": "729 NIF con un área, 14 con dos, uno con tres y uno con cinco; 33 grupos NIF–área con varias subáreas."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "direccion",
+          "origen": "direccion_tipo_via + direccion_nombre_via + direccion_numero + direccion_complemento",
+          "estado": "Compuesto",
+          "regla": "Revisar componentes incorporados antes de componer; tratar marcadores y acordar varias direcciones por organización.",
+          "nota": "Tipo y número pueden repetirse en nombre_via; direcciones heterogéneas y varias direcciones por NIF."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "codigo_postal",
+          "origen": "—",
+          "estado": "Sin correspondencia",
+          "regla": "Dejar sin dato de origen; cualquier enriquecimiento requiere otra etapa.",
+          "nota": "No hay campo equivalente identificado; no usar código municipal como código postal."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "longitud",
+          "origen": "—",
+          "estado": "Sin correspondencia",
+          "regla": "Dejar sin dato de origen; cualquier enriquecimiento requiere otra etapa.",
+          "nota": "No hay campo equivalente identificado; no usar código municipal como código postal."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "latitud",
+          "origen": "—",
+          "estado": "Sin correspondencia",
+          "regla": "Dejar sin dato de origen; cualquier enriquecimiento requiere otra etapa.",
+          "nota": "No hay campo equivalente identificado; no usar código municipal como código postal."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "descripcion",
+          "origen": "—",
+          "estado": "Sin correspondencia",
+          "regla": "Dejar sin dato de origen; cualquier enriquecimiento requiere otra etapa.",
+          "nota": "No hay campo equivalente identificado; no usar código municipal como código postal."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "contacto",
+          "origen": "telefono_1 + telefono_2",
+          "estado": "Compuesto",
+          "regla": "Conservar texto, revisar formato y _U, evitar números duplicados; acordar representación de varios contactos.",
+          "nota": "7 primeros y 2 segundos teléfonos no cumplen patrón; 20 filas con ambos teléfonos iguales."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "URL",
+          "origen": "pagina_web",
+          "estado": "Transformación",
+          "regla": "Separar URL, email y texto; revisar espacios/protocolo sin adivinar dominios. URL del informe equivale a url en Python.",
+          "nota": "619 _U; 191 informados; email, descripciones y hhtps://; disponibilidad no comprobada."
+        },
+        {
+          "objeto": "Localidad",
+          "campo": "código",
+          "origen": "direccion_municipio_id",
+          "estado": "Transformación",
+          "regla": "Convertir a texto para Localidad.codigo; validar codificación antes de rellenar ceros o cruzar fuentes.",
+          "nota": "90 códigos int64; no se confirmó que sean códigos INE."
+        },
+        {
+          "objeto": "Localidad",
+          "campo": "nombre",
+          "origen": "direccion_municipio_nombre",
+          "estado": "Transformación",
+          "regla": "Conservar conocidos y resolver _U antes de crear relaciones obligatorias.",
+          "nota": "83 nombres conocidos; 7 códigos con _U en 8 filas, sin nombre recuperable en la fuente."
+        },
+        {
+          "objeto": "Provincia",
+          "campo": "código",
+          "origen": "direccion_provincia_id",
+          "estado": "Transformación",
+          "regla": "Preservar texto y ceros iniciales; tratar _U. código del informe equivale a codigo en Python.",
+          "nota": "12 códigos conocidos más _U; 8 filas _U."
+        },
+        {
+          "objeto": "Provincia",
+          "campo": "nombre",
+          "origen": "direccion_provincia_nombre",
+          "estado": "Transformación",
+          "regla": "Conservar conocidos; acordar datos incompletos y construir Localidad.en_provincia cuando están resueltos.",
+          "nota": "Código–nombre uno-a-uno; las ocho filas municipales sin nombre tienen provincia _U."
+        }
+      ],
+      "inventario": [
+        {
+          "campo": "nif",
+          "significado": "Identificador fiscal",
+          "global": "Entidad.cod_entidad (candidato)",
+          "decision": "Mapear / revisar",
+          "hallazgos": "745 únicos de 810; 9 caracteres; sin nulos, _U, vacíos o espacios de borde; 51 NIF repetidos, máximo 7 filas. Validez fiscal no comprobada.",
+          "regla": "Conservar texto; acordar granularidad; no deduplicar por NIF."
+        },
+        {
+          "campo": "denominacion",
+          "significado": "Nombre de organización",
+          "global": "Entidad.nombre",
+          "decision": "Mapear / revisar",
+          "hallazgos": "745 únicos; longitudes 5–124; sin nulos/vacíos/espacios de borde; normalización mantiene 745 únicos. Filas 157, 319, 457 con finales posiblemente truncados, 99–100 caracteres, confirmados en JSON; errata posible Otrtas.",
+          "regla": "Preservar original; corregir solo con evidencia."
+        },
+        {
+          "campo": "numero_registro",
+          "significado": "Identificador registral",
+          "global": "—",
+          "decision": "Auxiliar",
+          "hallazgos": "749 únicos; completo; 14 caracteres; todos cumplen 3 letras + 4 dígitos + 2 letras + 5 dígitos. Un NIF y nombre por registro; 4 NIF tienen dos registros; frecuencia máxima 7.",
+          "regla": "Conservar trazabilidad; formato no implica validez."
+        },
+        {
+          "campo": "direccion_tipo_via",
+          "significado": "Tipo de vía",
+          "global": "Entidad.direccion",
+          "decision": "Mapear / revisar",
+          "hallazgos": "23 valores; sin nulos/_U; 49 vacíos tras strip. Tipo puede aparecer u omitirse en nombre_via tanto con tipo informado como vacío.",
+          "regla": "Revisar componentes duplicados antes de componer."
+        },
+        {
+          "campo": "direccion_nombre_via",
+          "significado": "Nombre y detalles de vía",
+          "global": "Entidad.direccion",
+          "decision": "Mapear / revisar",
+          "hallazgos": "685 únicos; longitudes 1–76; sin nulos/_U/vacíos/espacios de borde. Un texto Null; valor D ambiguo. Incluye números, edificios, localidades e instrucciones; variantes y espacios internos.",
+          "regla": "Tratar Null como posible marcador; conservar detalles originales."
+        },
+        {
+          "campo": "direccion_numero",
+          "significado": "Nómero de dirección",
+          "global": "Entidad.direccion",
+          "decision": "Mapear / revisar",
+          "hallazgos": "133 únicos; sin nulos/_U/vacíos/espacios de borde. S/n: 57, S/n.: 2; letras, rangos y varios números.",
+          "regla": "Mantener texto; sin número y valores no numíricos no son automáticamente errores."
+        },
+        {
+          "campo": "direccion_complemento",
+          "significado": "Detalle adicional de dirección",
+          "global": "Entidad.direccion",
+          "decision": "Mapear / revisar",
+          "hallazgos": "180 únicos; 488 _U; 70 valores con espacios de borde; strip reduce únicos a 166. Abreviaturas y espacios internos; - - - - como marcador posible.",
+          "regla": "Acordar marcadores y normalización sin perder detalles."
+        },
+        {
+          "campo": "direccion_provincia_id",
+          "significado": "Código de provincia",
+          "global": "Provincia.código",
+          "decision": "Mapear / revisar",
+          "hallazgos": "Texto; 12 códigos más _U en 8 filas; incluye 06. Sin nulos, vacíos ni espacios de borde detectados.",
+          "regla": "Validar códigos y resolver _U antes de integración; conservar originales."
+        },
+        {
+          "campo": "direccion_provincia_nombre",
+          "significado": "Nombre de provincia",
+          "global": "Provincia.nombre",
+          "decision": "Mapear / revisar",
+          "hallazgos": "12 nombres más _U en 8 filas; código–nombre uno-a-uno. Sin nulos, vacíos ni espacios de borde detectados.",
+          "regla": "Validar códigos y resolver _U antes de integración; conservar originales."
+        },
+        {
+          "campo": "direccion_municipio_id",
+          "significado": "Código municipal de origen",
+          "global": "Localidad.código",
+          "decision": "Mapear / revisar",
+          "hallazgos": "int64; 90 códigos; un nombre y un valor provincial por código, incluidos marcadores; codificación no verificada. Sin nulos, vacíos ni espacios de borde detectados.",
+          "regla": "Validar códigos y resolver _U antes de integración; conservar originales."
+        },
+        {
+          "campo": "direccion_municipio_nombre",
+          "significado": "Nombre municipal",
+          "global": "Localidad.nombre",
+          "decision": "Mapear / revisar",
+          "hallazgos": "83 nombres y _U; 7 códigos sin nombre en 8 filas; tampoco tienen provincia conocida; nombres conocidos uno-a-uno con código. Sin nulos, vacíos ni espacios de borde detectados.",
+          "regla": "Validar códigos y resolver _U antes de integración; conservar originales."
+        },
+        {
+          "campo": "direccion_isla_id",
+          "significado": "Código de isla",
+          "global": "—",
+          "decision": "Auxiliar",
+          "hallazgos": "7 códigos y _U; 40 _U: 32 filas de provincia peninsular y 8 de provincia desconocida. Sin nulos, vacíos ni espacios de borde detectados.",
+          "regla": "Preservar códigos y nombres; tratar marcadores; isla no tiene atributo propio en la global."
+        },
+        {
+          "campo": "direccion_isla_nombre",
+          "significado": "Nombre de isla",
+          "global": "—",
+          "decision": "Auxiliar",
+          "hallazgos": "7 nombres y _U; código–nombre uno-a-uno. _U puede ser no aplicable o desconocido. Sin nulos, vacíos ni espacios de borde detectados.",
+          "regla": "Preservar códigos y nombres; tratar marcadores; isla no tiene atributo propio en la global."
+        },
+        {
+          "campo": "telefono_1",
+          "significado": "Primer teléfono",
+          "global": "Entidad.contacto",
+          "decision": "Mapear / revisar",
+          "hallazgos": "728 únicos; completo, sin _U/vacíos/espacios de borde; 803 cumplen (34)+9 dígitos, 7 no. Un valor por cada uno de los 745 NIF.",
+          "regla": "Revisar anomalías; patrón no demuestra validez."
+        },
+        {
+          "campo": "telefono_2",
+          "significado": "Segundo teléfono",
+          "global": "Entidad.contacto",
+          "decision": "Mapear / revisar",
+          "hallazgos": "171 únicos incluido _U; 625 _U; 185 informados, 183 cumplen patrón y 2 no. Un valor informado por cada uno de 172 NIF; igual al primero en 20 filas.",
+          "regla": "Tratar _U y eliminar duplicación de contacto sin eliminar registros."
+        },
+        {
+          "campo": "pagina_web",
+          "significado": "Web u otra referencia",
+          "global": "Entidad.URL",
+          "decision": "Mapear / revisar",
+          "hallazgos": "173 únicos incluido _U; 619 _U, 191 informados, 172 distintos. Sin vacíos ni espacios de borde; 6 filas con espacios internos. Email, texto y hhtps://; un valor informado por cada uno de 172 NIF.",
+          "regla": "Clasificar y limpiar; no corregir dominios por conjetura; disponibilidad no verificada."
+        },
+        {
+          "campo": "area_id",
+          "significado": "Código de área",
+          "global": "Entidad.ambito",
+          "decision": "Mapear / revisar",
+          "hallazgos": "9 códigos int64 completos; uno-a-uno con nombre. 16 NIF con varias áreas.",
+          "regla": "Mapear por significado y conservar multiplicidad."
+        },
+        {
+          "campo": "area_nombre",
+          "significado": "área de actividad",
+          "global": "Entidad.ambito",
+          "decision": "Mapear / revisar",
+          "hallazgos": "9 nombres; sin nulos/_U/vacíos/espacios de borde. Varios: 414 filas. Categorías distintas del enum global.",
+          "regla": "Revisar categorías residuales y mixtas; usar subáreas como evidencia."
+        },
+        {
+          "campo": "subarea_id",
+          "significado": "Código de subárea",
+          "global": "Entidad.ambito (auxiliar)",
+          "decision": "Mapear / revisar",
+          "hallazgos": "16 códigos más _U en 394 filas; 1–7 en área 9 y A–I en área 8; uno-a-uno con nombre.",
+          "regla": "Preservar área–subárea y códigos como texto; _U no es categoría."
+        },
+        {
+          "campo": "subarea_nombre",
+          "significado": "Detalle de actividad",
+          "global": "Entidad.ambito (auxiliar)",
+          "decision": "Mapear / revisar",
+          "hallazgos": "16 nombres más _U; sin nulos/vacíos/espacios de borde. Grupos NIF–área excluyendo _U: 341 con 1 subárea, 29 con 2, 3 con 3 y 1 con 6.",
+          "regla": "Conservar todas las subáreas; precisar mapeo sin forzar equivalencias."
+        }
+      ],
+      "ambitos": [
+        {
+          "global": "MAYORES",
+          "origen": "Tercera Edad",
+          "estado": "Mapeado",
+          "nota": "Correspondencia semántica propuesta; conservar múltiples ámbitos."
+        },
+        {
+          "global": "DISCAPACIDAD",
+          "origen": "Discapacidad",
+          "estado": "Mapeado",
+          "nota": "Correspondencia semántica propuesta; conservar múltiples ámbitos."
+        },
+        {
+          "global": "INFANCIA_Y_JUVENTUD",
+          "origen": "Menores Y Juventud",
+          "estado": "Mapeado",
+          "nota": "Correspondencia semántica propuesta; conservar múltiples ámbitos."
+        },
+        {
+          "global": "MUJER",
+          "origen": "Mujer",
+          "estado": "Mapeado",
+          "nota": "Correspondencia semántica propuesta; conservar múltiples ámbitos."
+        },
+        {
+          "global": "INCLUSION_SOCIAL",
+          "origen": "Exclusión Social",
+          "estado": "Mapeado",
+          "nota": "Correspondencia semántica propuesta; conservar múltiples ámbitos."
+        },
+        {
+          "global": "VOLUNTARIADO_Y_PARTICIPACION_COMUNITARIA",
+          "origen": "Voluntariado",
+          "estado": "Mapeado",
+          "nota": "Correspondencia semántica propuesta; conservar múltiples ámbitos."
+        },
+        {
+          "global": "MIGRACION",
+          "origen": "Varios / Migración",
+          "estado": "Revisar",
+          "nota": "Subárea explícita; no aplicar a todo Varios."
+        },
+        {
+          "global": "SALUD_Y_ATENCION_SOCIOSANITARIA",
+          "origen": "Drogodependencia; Varios / H; Voluntariado / Asuntos Sanitarios",
+          "estado": "Revisar",
+          "nota": "Candidatos más amplios; revisar alcance."
+        },
+        {
+          "global": "EDUCACION_Y_FORMACION",
+          "origen": "Voluntariado / 4",
+          "estado": "Revisar",
+          "nota": "Subárea mezcla educación, ciencia, cultura y deportes; revisar."
+        },
+        {
+          "global": "EMPLEO_E_INSERCION_LABORAL",
+          "origen": "Centros Ocupacionales; Varios / B",
+          "estado": "Revisar",
+          "nota": "No asumir inserción laboral por centro ocupacional; B mezcla servicios e inclusión."
+        },
+        {
+          "global": "CULTURA_Y_DESARROLLO_COMUNITARIO",
+          "origen": "Varios / A, E; Voluntariado / 4",
+          "estado": "Revisar",
+          "nota": "Categorías compuestas; revisar."
+        },
+        {
+          "global": "SALUD_MENTAL",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita equivalente; no inferir de Drogodependencia."
+        },
+        {
+          "global": "—",
+          "origen": "Varios / Otros; restantes subáreas mixtas",
+          "estado": "Revisar",
+          "nota": "Preservar detalle; no forzar categorías residuales al enum."
+        }
+      ],
+      "decisiones": [
+        {
+          "tema": "Identidad y granularidad",
+          "prioridad": "Alta",
+          "evidencia": "Organizaciones y registros en Canarias frente a centros en Valencia; 4 NIF con dos registros, direcciones múltiples.",
+          "decision": "Acordar significado de Entidad, claves globales y representación de sedes; no vincular NIF y ni_centro automáticamente."
+        },
+        {
+          "tema": "Multiplicidad de ámbitos",
+          "prioridad": "Alta",
+          "evidencia": "16 NIF con varias áreas y 33 grupos con varias subáreas; Python admite un único Ambito.",
+          "decision": "Permitir varios ámbitos o definir representación sin pérdida; aprobar equivalencias ambiguas."
+        },
+        {
+          "tema": "Municipios incompletos y codificación",
+          "prioridad": "Alta",
+          "evidencia": "7 códigos en 8 filas sin nombre/provincia; código municipal no validado. Python exige Localidad.nombre y en_provincia.",
+          "decision": "Validar sistema, acordar enriquecimiento, cuarentena o modelo opcional; no asumir códigos INE ni fabricar relaciones."
+        },
+        {
+          "tema": "Direcciones y sedes",
+          "prioridad": "Alta",
+          "evidencia": "Componentes mezclados y duplicados; varias direcciones por NIF.",
+          "decision": "Acordar varias sedes/localidades y composición; no concatenar ciegamente ni escoger dirección arbitraria."
+        },
+        {
+          "tema": "Nombres y truncamientos",
+          "prioridad": "Media",
+          "evidencia": "Finales sospechosos confirmados en JSON, posibles erratas.",
+          "decision": "Preservar originales y corregir solo con evidencia."
+        },
+        {
+          "tema": "Contactos y webs",
+          "prioridad": "Media",
+          "evidencia": "9 teléfonos fuera de patrón; 20 contactos repetidos; web mezcla URL/email/texto.",
+          "decision": "Definir estructura, limpieza, revisión y tratamiento de marcadores."
+        },
+        {
+          "tema": "Información sin destino",
+          "prioridad": "Media",
+          "evidencia": "Isla y registro sin atributo dedicado; faltan postal, coordenadas y descripción.",
+          "decision": "Conservar metadatos; dejar campos sin fuente ausentes y acordar significado contextual de _U."
+        }
+      ]
+    }
   ]
 };
