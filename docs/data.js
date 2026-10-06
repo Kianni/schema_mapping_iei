@@ -505,6 +505,388 @@ window.IEI_DATA = {
           "decision": "Conservar metadatos; dejar campos sin fuente ausentes y acordar significado contextual de _U."
         }
       ]
+    },
+    {
+      "id": "catalunya_ongd",
+      "nombre": "Catalunya · ONGD",
+      "archivo": "Entitats_ONGD_pretty.xml",
+      "registros": 765,
+      "campos": 11,
+      "resumen": [
+        "Análisis documentado en notebooks/entitats_xml.ipynb: 765 registros entitat y 11 campos, sin filas completamente duplicadas, campos anidados ni atributos XML. Solo observaciones; no se limpian, transforman ni fusionan datos.",
+        "Registro y nombre están completos y son únicos dentro del archivo. 27 registros incluyen un punto en el XML, como 1.005, e infieren float64 en pandas; su significado y la identidad entre fuentes quedan abiertos.",
+        "Hay palabras concatenadas ya en XML en nombre, naturaleza, dirección y municipio. 764 nombres no contienen caracteres de espacio; el restante contiene un salto de línea. Todas las direcciones, etiquetas de naturaleza y municipios carecen de espacios; los valores de una palabra no son errores por este motivo.",
+        "CIF: 83 ausentes y dos valores repetidos en cuatro filas. Los grupos tienen nombres, registros, direcciones y contactos distintos; G55258909 también presenta naturalezas distintas. Las comparaciones no determinan relación jurídica ni error de fuente.",
+        "Los 765 códigos postales literales tienen cinco dígitos y 618 empiezan por cero, perdido al inferir int64. Seis códigos tienen varios municipios y 21 municipios varios códigos. VilanovailaGeltrú presenta 00800 en una fila y 08800 en dos: discrepancia pendiente de revisión.",
+        "Teléfonos: 221 ausencias en tel_fon y 212 en tel_fon_m_bil; 40 y 23 celdas fuera del patrón de un único número de nueve dígitos. Se distinguen multilínea, extensiones, barra y prefijo; el rótulo no acredita servicio fijo o móvil.",
+        "Correo: 35 ausentes. De las celdas informadas, 76 cumplen el patrón simple, 627 tienen una @ y dominio sin punto, 25 tienen varias @ y 2 ninguna. No se reconstruyen dominios ni se valida entrega.",
+        "Web: 154 ausentes; 56 valores repiten esquemas como http://https://. Los 611 hostnames analizados carecen de puntos, incluidos los casos donde el hostname es un efecto de esa sintaxis. No se establecen dominios previstos ni disponibilidad.",
+        "Direcciones y contactos compartidos no demuestran duplicación: 10 direcciones repetidas en 20 filas; 28 teléfonos, 10 móviles, 4 correos y 3 webs repetidos. Los dos registros Yamuna comparten los cuatro contactos, pero difieren en CIF, nombre, naturaleza y dirección.",
+        "En 12 filas faltan ambos teléfonos; 11 conservan correo. Una carece también de correo y web (registro 392). De 35 filas sin correo, 34 tienen teléfono. Ausencias de CIF y contactos no coinciden; diferencias por naturaleza son descriptivas, no causales.",
+        "Correspondencias candidatas: registro, nombre, dirección, código postal, municipio, contactos y web. Faltan coordenadas, descripción explícita, clasificación para Ambito, código municipal y provincia. Naturaleza jurídica no equivale a Ambito; en_localidad no puede completarse con campos explícitos solamente."
+      ],
+      "mapeoGlobal": [
+        {
+          "objeto": "Entidad",
+          "campo": "cod_entidad",
+          "origen": "n_mero_registre",
+          "estado": "Transformación",
+          "regla": "Candidato a identificador textual; acordar representación del registro y unicidad entre fuentes. No aplicar interpretación numérica al punto.",
+          "nota": "765 valores únicos y completos en XML y pandas; 738 textos de dígitos y 27 con punto seguido de tres dígitos. Ninguna regla de transformación ha sido ejecutada."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "nombre",
+          "origen": "nom_de_l_entitat",
+          "estado": "Directo",
+          "regla": "Correspondencia candidata directa, conservando el nombre literal. No reconstruir espacios sin evidencia.",
+          "nota": "765 nombres distintos y completos; longitudes 5–165; 764 sin caracteres de espacio y uno con salto de línea. Unicidad local no implica identidad universal."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "ambito",
+          "origen": "—",
+          "estado": "Sin correspondencia",
+          "regla": "No asignar Ambito por nombre, naturaleza jurídica ni por pertenecer al registro ONGD.",
+          "nota": "No hay clasificación de actividad o población destinataria que establezca valores del enum. naturalesa describe forma jurídica; Ambito admite None en Python."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "direccion",
+          "origen": "adre_a",
+          "estado": "Directo",
+          "regla": "Correspondencia candidata con texto original; no separar o recomponer direcciones en este informe.",
+          "nota": "765 valores, 755 distintos; longitudes 7–66; ninguno contiene espacios. 10 direcciones repetidas en 20 filas con registros y nombres distintos."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "codigo_postal",
+          "origen": "codi_postal",
+          "estado": "Transformación",
+          "regla": "En la integración futura tomar texto literal del XML, compatible con str | None; representación pendiente. No corregir discrepancias geográficas por conjetura.",
+          "nota": "Todos los textos tienen cinco dígitos; 618 empiezan por cero, perdido en int64. 209 códigos distintos; 00800/08800 para VilanovailaGeltrú requiere revisión."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "longitud",
+          "origen": "—",
+          "estado": "Sin correspondencia",
+          "regla": "Sin coordenada de origen; no inferirla a partir del texto de dirección en este análisis.",
+          "nota": "No hay coordenadas ni geometrías; el atributo admite None."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "latitud",
+          "origen": "—",
+          "estado": "Sin correspondencia",
+          "regla": "Sin coordenada de origen; no inferirla a partir del texto de dirección en este análisis.",
+          "nota": "No hay coordenadas ni geometrías; el atributo admite None."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "descripcion",
+          "origen": "—",
+          "estado": "Sin correspondencia",
+          "regla": "No generar descripción a partir del nombre o de la naturaleza jurídica.",
+          "nota": "No hay descripción explícita; el atributo admite None."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "contacto",
+          "origen": "tel_fon + tel_fon_m_bil + correu_electr_nic",
+          "estado": "Compuesto",
+          "regla": "Acordar representación de los tres componentes y de varios valores en una celda dentro de un único str | None. No seleccionar, unir o separar contactos aquí.",
+          "nota": "12 filas sin ambos teléfonos; 11 conservan correo. Una sin teléfono, móvil, correo ni web. Hay contactos compartidos entre registros distintos."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "URL",
+          "origen": "web",
+          "estado": "Transformación",
+          "regla": "Correspondencia candidata; revisar sintaxis con la fuente anterior antes de definir cualquier transformación. No insertar puntos ni retirar prefijos por conjetura.",
+          "nota": "En global_schema.py el atributo se llama url; la interfaz usa la etiqueta URL. 611 valores, 154 ausentes, 56 esquemas repetidos; ningún hostname analizado contiene puntos."
+        },
+        {
+          "objeto": "Localidad",
+          "campo": "código",
+          "origen": "—",
+          "estado": "Sin correspondencia",
+          "regla": "No usar codi_postal como identificador municipal. Falta una fuente explícita para codigo (nombre del atributo en Python).",
+          "nota": "No hay código municipal. 21 municipios tienen varios códigos postales y seis códigos postales varios municipios; Localidad.codigo es obligatorio."
+        },
+        {
+          "objeto": "Localidad",
+          "campo": "nombre",
+          "origen": "municipi",
+          "estado": "Directo",
+          "regla": "Correspondencia candidata con etiqueta original; no reconstruir espacios ni equivalencias oficiales sin evidencia.",
+          "nota": "765 valores completos y 113 etiquetas distintas. El nombre no basta para construir Localidad: también exige codigo y en_provincia."
+        },
+        {
+          "objeto": "Provincia",
+          "campo": "código",
+          "origen": "—",
+          "estado": "Sin correspondencia",
+          "regla": "Sin código provincial explícito; no asignar provincias a partir de prefijos postales no verificados.",
+          "nota": "Provincia.codigo es obligatorio en Python. Solo se han contado prefijos literales, no validado ni derivado provincias."
+        },
+        {
+          "objeto": "Provincia",
+          "campo": "nombre",
+          "origen": "—",
+          "estado": "Sin correspondencia",
+          "regla": "Sin nombre provincial explícito; dejar pendiente la representación y cualquier enriquecimiento.",
+          "nota": "Provincia.nombre es obligatorio; no existe columna equivalente en XML."
+        },
+        {
+          "objeto": "Entidad",
+          "campo": "en_localidad",
+          "origen": "—",
+          "estado": "Revisar modelo",
+          "regla": "Relación obligatoria pendiente: resolver códigos de localidad y provincia antes de construir Entidad. No fabricar objetos incompletos.",
+          "nota": "municipi solo aporta Localidad.nombre. El esquema Python exige un objeto Localidad; la relación se muestra aparte de los atributos escalares del resumen."
+        },
+        {
+          "objeto": "Localidad",
+          "campo": "en_provincia",
+          "origen": "—",
+          "estado": "Sin correspondencia",
+          "regla": "Relación obligatoria sin provincia explícita; requiere decisión de modelo o enriquecimiento acordado.",
+          "nota": "global_schema.py exige un objeto Provincia con codigo y nombre. Ninguna relación provincial ha sido inferida."
+        }
+      ],
+      "inventario": [
+        {
+          "campo": "n_mero_registre",
+          "significado": "Identificador de registro de la entidad",
+          "global": "Entidad.cod_entidad (candidato)",
+          "decision": "Revisar",
+          "hallazgos": "765 valores no nulos; todos únicos en pandas y en el XML literal. Registro y nombre tienen relación uno a uno en este archivo. pandas infiere float64: 738 textos contienen solo dígitos y 27 un punto seguido de tres dígitos, por ejemplo 1.005. El punto podría separar miles; su significado no está confirmado. No se interpreta como magnitud ni se corrige. Al excluir registro, nombre y CIF, no hay dos filas iguales en todos los demás campos. Candidato a Entidad.cod_entidad (str). Quedan abiertas la unicidad entre fuentes y la representación final.",
+          "regla": "Conservar el texto literal del XML. Acordar significado del punto y clave entre fuentes; no convertir por conjetura a entero."
+        },
+        {
+          "campo": "nom_de_l_entitat",
+          "significado": "Nombre de la organización",
+          "global": "Entidad.nombre",
+          "decision": "Mapear",
+          "hallazgos": "765 nombres informados y distintos; longitudes de 5 a 165. Sin espacios iniciales/finales. 764 nombres no contienen caracteres de espacio; el restante contiene un salto de línea. Todos coinciden con el XML literal. Hay palabras concatenadas, como AccióSolidàriadelVallès, que pueden dificultar lectura y comparación. Los nombres de una palabra no requieren espacios. Se muestran longitudes extremas y finales para inspección; estas comprobaciones no demuestran truncamiento. Candidato a Entidad.nombre; su unicidad aquí no demuestra identidad universal.",
+          "regla": "Correspondencia candidata directa. Conservar la grafía de origen; no insertar espacios ni reconstruir nombres sin evidencia."
+        },
+        {
+          "campo": "naturalesa",
+          "significado": "Naturaleza jurídica u organizativa",
+          "global": "—",
+          "decision": "Sin correspondencia",
+          "hallazgos": "Campo categórico completo: 12 valores; Associació aparece en 536 filas y Fundació en 132. Etiquetas compuestas sin espacios, como AssociacióEstatal; no es anomalía en etiquetas de una palabra. Ausencias por naturaleza: CIF en 73/536 asociaciones (13,6%) y 9/132 fundaciones (6,8%); móvil en 127/536 (23,7%) y 58/132 (43,9%), respectivamente. Se muestran tamaños y porcentajes por grupo. Las categorías pequeñas no permiten generalizaciones ni conclusiones causales. Describe naturaleza jurídica/organizativa, no Ambito. No hay atributo específico en el esquema.",
+          "regla": "No equiparar naturaleza jurídica con Ambito. Decidir si el modelo necesita un atributo específico; conservar como dato de origen."
+        },
+        {
+          "campo": "cif_entitat",
+          "significado": "Identificador fiscal informado por la fuente",
+          "global": "—",
+          "decision": "Revisar",
+          "hallazgos": "682 valores informados, 83 ausentes (10,8%) y 680 CIF distintos. Todos los textos informados tienen nueve caracteres. 681 cumplen el patrón orientativo de organización. 46414697F tiene forma similar a DNI; no se valida control ni identidad jurídica. Dos CIF repetidos afectan a cuatro filas. Ambos grupos difieren en registro, nombre, dirección, código postal, municipio, móvil y correo. G55258909 también difiere en naturaleza (Associació / Federació) y disponibilidad de teléfono. G10932812 tiene Associació en ambas filas y carece de teléfono en las dos. Las cuatro carecen de web. La comparación completa no determina si son organizaciones relacionadas o errores de fuente. Compartir CIF no basta para fusionar. No es clave completa y única; no hay atributo CIF/NIF específico en el esquema.",
+          "regla": "Sin atributo CIF/NIF específico. Revisar ausencias y grupos repetidos; no usar como clave única ni fusionar por CIF."
+        },
+        {
+          "campo": "adre_a",
+          "significado": "Dirección en texto libre con componentes unidos",
+          "global": "Entidad.direccion",
+          "decision": "Mapear",
+          "hallazgos": "765 direcciones informadas y 755 distintas; longitudes de 7 a 66. Ninguna contiene caracteres de espacio. Palabras y componentes unidos, como PladelVinyet,9BlocDbaixos; puntuación y separación variables, ya en el XML. 10 direcciones aparecen dos veces (20 filas). Cada pareja comparte municipio y código postal, pero tiene registros y nombres distintos. Siete parejas tienen dos CIF conocidos distintos; en tres falta uno de los CIF. Las tablas comparan los demás campos. Compartir dirección no demuestra duplicación. Candidato a Entidad.direccion; no se reconstruyen componentes.",
+          "regla": "Correspondencia candidata directa. Preservar texto y detalles; una dirección compartida no justifica fusionar registros."
+        },
+        {
+          "campo": "codi_postal",
+          "significado": "Código postal literal de cinco dígitos",
+          "global": "Entidad.codigo_postal",
+          "decision": "Transformación",
+          "hallazgos": "765 valores completos y 209 distintos. Todos los textos XML tienen cinco dígitos; 618 empiezan por cero. pandas infiere int64 y pierde ceros iniciales en la representación cargada. 00800 se observa como 800 en el registro 540; su exactitud geográfica no está comprobada. Seis códigos aparecen con varios municipios: 08197, 08227, 08293, 08330, 08902, 08930. Se muestra contexto de nombre y dirección para revisión. 21 municipios tienen varios códigos. La relación no es uno a uno y por sí sola no demuestra errores. Candidato a Entidad.codigo_postal (str | None), no Localidad.codigo. No se restauran ceros ni se cambian códigos.",
+          "regla": "El esquema espera texto. Para una integración futura usar el valor literal del XML, sin inferencia numérica; no corregir códigos geográficos por conjetura."
+        },
+        {
+          "campo": "municipi",
+          "significado": "Nombre del municipio",
+          "global": "Localidad.nombre",
+          "decision": "Mapear",
+          "hallazgos": "765 valores informados y 113 etiquetas distintas. Barcelona aparece 428 veces. Sin caracteres de espacio. Nombres compuestos como SantCugatdelVallès concatenan palabras; esto no afecta a nombres de una palabra como Barcelona. Se muestran longitudes extremas y multiplicidad de códigos y prefijos postales; no se asignan provincias mediante prefijos. 112 municipios tienen un prefijo postal literal; VilanovailaGeltrú tiene dos: 00 (una fila, 00800) y 08 (dos filas, 08800). Es una discrepancia interna para revisión; no se establece aquí el código correcto. Candidato a Localidad.nombre mediante Entidad.en_localidad. Faltan código municipal, código/nombre de provincia y relación provincial explícita. No se establece exactitud geográfica ni equivalencia con etiquetas municipales oficiales.",
+          "regla": "Correspondencia candidata con nombre. No sustituir código municipal por código postal ni fabricar la relación con Provincia."
+        },
+        {
+          "campo": "tel_fon",
+          "significado": "Contacto telefónico; puede incluir varios números o extensiones",
+          "global": "Entidad.contacto",
+          "decision": "Compuesto",
+          "hallazgos": "544 textos informados, 221 ausentes (28,9%) y 510 textos distintos. 504 contienen nueve dígitos. Los otros 40: 34 multilínea, 4 con extensión en una línea, 1 con barra en una línea y 1 con prefijo internacional en una línea. Categorías excluyentes; multilínea tiene prioridad. 26 celdas multilínea tienen dos líneas de nueve dígitos exactos. Otras incluyen espacios, barra, extensión o una segunda línea de ocho dígitos; se muestran literalmente. 22 de los 504 valores de nueve dígitos empiezan por 6. El rótulo no garantiza teléfono fijo; el formato no acredita validez del número. 28 textos se repiten en 62 filas; 27 grupos tienen varias direcciones y 3 varios municipios. Compartir número no demuestra identidad de entidad. Componente candidato para Entidad.contacto; no se separan ni reescriben celdas.",
+          "regla": "Componente candidato de contacto. Definir representación sin pérdida de varios números y extensiones; no aplicar selección, separación o limpieza en este informe."
+        },
+        {
+          "campo": "tel_fon_m_bil",
+          "significado": "Segundo contacto telefónico, etiquetado como móvil",
+          "global": "Entidad.contacto",
+          "decision": "Compuesto",
+          "hallazgos": "553 textos informados, 212 ausentes (27,7%) y 543 textos distintos. 530 contienen nueve dígitos; 23 son multilínea. De estas, 22 tienen dos líneas de nueve dígitos y una incluye +34 en la segunda línea. Ocho valores de nueve dígitos empiezan por 9; el rótulo no acredita servicio móvil. 10 textos se repiten en 20 filas; todos los grupos tienen direcciones distintas y 4 varios municipios. En 12 filas faltan ambos teléfonos. Una fila tiene el mismo valor informado en ambos campos; tres grupos de dos filas comparten la pareja telefónica, pero tienen CIF distintos. Componente candidato para Entidad.contacto; no se seleccionan ni separan teléfonos.",
+          "regla": "Componente candidato de contacto; no garantizar servicio móvil por el rótulo. Acordar tratamiento de multiplicidad y coincidencias entre teléfonos."
+        },
+        {
+          "campo": "correu_electr_nic",
+          "significado": "Correo de contacto; algunas celdas incluyen varios textos",
+          "global": "Entidad.contacto",
+          "decision": "Compuesto",
+          "hallazgos": "730 textos informados, 35 ausentes (4,6%) y 726 textos distintos. Categorías excluyentes por celda: 76 cumplen el patrón simple de correo único; 627 tienen una @ y dominio sin punto; 25 tienen varias @; 2 no tienen @. Entre los 627 casos está acciosolidariavalles@gmailcom. Por separado, 650 celdas no contienen ningún punto en todo el texto; son medidas distintas. De las 25 celdas con varias @, 9 contienen saltos de línea y 16 carecen de espacios. Sin @: sakadawaorggmailcom e infoarrobaproinfantsorg. Ya aparecen así en XML. Cuatro textos se repiten en ocho filas; cada pareja tiene nombres y direcciones distintos. Tres parejas tienen dos CIF conocidos distintos; en una falta un CIF. Una pareja abarca dos municipios. El patrón no determina entrega ni dirección prevista. Candidato a Entidad.contacto; no se insertan puntos ni separadores.",
+          "regla": "Componente candidato de contacto. No insertar puntos ni separar correos concatenados por conjetura; el patrón no valida entrega ni dominio previsto."
+        },
+        {
+          "campo": "web",
+          "significado": "Referencia web de la entidad",
+          "global": "Entidad.URL (url en Python)",
+          "decision": "Revisar",
+          "hallazgos": "611 textos informados, 154 ausentes (20,1%) y 607 textos distintos. 56 celdas repiten el esquema, como http://https://cecodees/. En ellas urlsplit devuelve https o http como hostname: efecto de análisis de la sintaxis de origen. Los 611 hostnames analizados carecen de puntos, incluidos esos 56 casos. Ejemplos ordinarios como http://wwwigmancat también carecen de punto en el host literal. No se establecen dominios previstos. Tres URLs se repiten en siete filas. Quepo y Yamuna tienen CIF conocidos distintos; http://wwwsolidariesorg abarca tres nombres y dos municipios, con un CIF ausente. Dos registros Yamuna comparten los cuatro contactos informados, pero difieren en registro, nombre, CIF, naturaleza y texto de dirección. Sugiere revisar una posible relación, no fusionar automáticamente. Candidato a Entidad.url; no se reparan esquemas/dominios ni se comprueba DNS o disponibilidad.",
+          "regla": "Correspondencia candidata con Entidad.url. Conservar texto y señalar dominios sin puntos y esquemas repetidos; no reconstruir URL ni comprobar disponibilidad aquí."
+        }
+      ],
+      "ambitos": [
+        {
+          "global": "MAYORES",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita de actividad o población destinataria que establezca esta correspondencia. naturalesa es jurídica y no determina Ambito; no se infiere por nombre ni por registro ONGD."
+        },
+        {
+          "global": "DISCAPACIDAD",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita de actividad o población destinataria que establezca esta correspondencia. naturalesa es jurídica y no determina Ambito; no se infiere por nombre ni por registro ONGD."
+        },
+        {
+          "global": "SALUD_MENTAL",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita de actividad o población destinataria que establezca esta correspondencia. naturalesa es jurídica y no determina Ambito; no se infiere por nombre ni por registro ONGD."
+        },
+        {
+          "global": "INFANCIA_Y_JUVENTUD",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita de actividad o población destinataria que establezca esta correspondencia. naturalesa es jurídica y no determina Ambito; no se infiere por nombre ni por registro ONGD."
+        },
+        {
+          "global": "MUJER",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita de actividad o población destinataria que establezca esta correspondencia. naturalesa es jurídica y no determina Ambito; no se infiere por nombre ni por registro ONGD."
+        },
+        {
+          "global": "MIGRACION",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita de actividad o población destinataria que establezca esta correspondencia. naturalesa es jurídica y no determina Ambito; no se infiere por nombre ni por registro ONGD."
+        },
+        {
+          "global": "INCLUSION_SOCIAL",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita de actividad o población destinataria que establezca esta correspondencia. naturalesa es jurídica y no determina Ambito; no se infiere por nombre ni por registro ONGD."
+        },
+        {
+          "global": "EDUCACION_Y_FORMACION",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita de actividad o población destinataria que establezca esta correspondencia. naturalesa es jurídica y no determina Ambito; no se infiere por nombre ni por registro ONGD."
+        },
+        {
+          "global": "EMPLEO_E_INSERCION_LABORAL",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita de actividad o población destinataria que establezca esta correspondencia. naturalesa es jurídica y no determina Ambito; no se infiere por nombre ni por registro ONGD."
+        },
+        {
+          "global": "SALUD_Y_ATENCION_SOCIOSANITARIA",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita de actividad o población destinataria que establezca esta correspondencia. naturalesa es jurídica y no determina Ambito; no se infiere por nombre ni por registro ONGD."
+        },
+        {
+          "global": "VOLUNTARIADO_Y_PARTICIPACION_COMUNITARIA",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita de actividad o población destinataria que establezca esta correspondencia. naturalesa es jurídica y no determina Ambito; no se infiere por nombre ni por registro ONGD."
+        },
+        {
+          "global": "CULTURA_Y_DESARROLLO_COMUNITARIO",
+          "origen": "—",
+          "estado": "No representado",
+          "nota": "Sin categoría explícita de actividad o población destinataria que establezca esta correspondencia. naturalesa es jurídica y no determina Ambito; no se infiere por nombre ni por registro ONGD."
+        }
+      ],
+      "decisiones": [
+        {
+          "tema": "Identidad y registro",
+          "prioridad": "Alta",
+          "evidencia": "765 registros y nombres únicos dentro del archivo; 27 registros con punto. CIF incompleto y repetido en dos grupos. Valencia describe centros y las otras fuentes pueden usar otra granularidad.",
+          "decision": "Acordar qué representa Entidad, significado del registro y clave entre fuentes; no vincular automáticamente registro, CIF y ni_centro."
+        },
+        {
+          "tema": "CIF repetidos",
+          "prioridad": "Alta",
+          "evidencia": "G10932812 y G55258909 afectan a cuatro filas con direcciones y contactos distintos; G55258909 también difiere en naturaleza. Las cuatro carecen de web.",
+          "decision": "Revisar con una fuente autorizada si son organizaciones relacionadas o errores; no fusionar ni corregir el CIF por conjetura."
+        },
+        {
+          "tema": "Localidad y provincia obligatorias",
+          "prioridad": "Alta",
+          "evidencia": "Solo hay nombre municipal; faltan código municipal y provincia explícita. Python exige Entidad.en_localidad y Localidad.en_provincia.",
+          "decision": "Acordar enriquecimiento o representación en el modelo antes de integrar; no sustituir código municipal por postal ni fabricar relaciones provinciales."
+        },
+        {
+          "tema": "Palabras concatenadas en XML",
+          "prioridad": "Alta",
+          "evidencia": "Ejemplos en nombre, naturaleza, dirección y municipio coinciden con el XML literal. Los valores de una palabra no necesitan espacios; no se ha establecido la causa.",
+          "decision": "Revisar el documento o extracción previa para establecer el texto previsto; preservar originales y no reconstruir espacios automáticamente."
+        },
+        {
+          "tema": "Código postal: tipo y discrepancias",
+          "prioridad": "Alta",
+          "evidencia": "618 códigos con cero inicial perdido por inferencia numérica; seis códigos con varios municipios. Registro 540: 00800 en VilanovailaGeltrú; otras dos filas del municipio: 08800.",
+          "decision": "Acordar lectura textual en la integración y revisar asociaciones geográficas; no afirmar el código correcto ni aplicar relleno o sustitución por conjetura."
+        },
+        {
+          "tema": "Dominio email y varios correos",
+          "prioridad": "Alta",
+          "evidencia": "627 celdas con una @ y dominio sin punto; 25 con varias @ (9 multilínea y 16 sin espacios); dos sin @. Anomalías ya presentes en XML.",
+          "decision": "Consultar fuente anterior para determinar dominios y separación de contactos; conservar textos, sin insertar puntos o dividir por conjetura."
+        },
+        {
+          "tema": "URL y esquemas repetidos",
+          "prioridad": "Alta",
+          "evidencia": "56 textos con varios esquemas http(s)://; los 611 hostnames analizados carecen de puntos. En esquemas repetidos el hostname resulta de la sintaxis mal formada.",
+          "decision": "Confirmar URL prevista en la fuente antes de definir cualquier reparación. No equiparar análisis sintáctico con existencia o disponibilidad del sitio."
+        },
+        {
+          "tema": "Teléfonos y único contacto global",
+          "prioridad": "Media",
+          "evidencia": "40 celdas tel_fon y 23 tel_fon_m_bil fuera del patrón de nueve dígitos: multilínea, extensiones, barra o prefijo. Una fila repite el mismo teléfono en ambos campos.",
+          "decision": "Acordar representación sin pérdida de teléfonos, móviles y correo dentro de contacto; el informe no selecciona, separa ni normaliza valores."
+        },
+        {
+          "tema": "Direcciones y contactos compartidos",
+          "prioridad": "Media",
+          "evidencia": "10 direcciones compartidas en 20 filas; dos registros Yamuna comparten todos los contactos pero tienen CIF y naturalezas distintos. Teléfonos y webs también se comparten entre municipios.",
+          "decision": "Investigar posibles relaciones o sedes compartidas con contexto; no deduplicar por coincidencias aisladas ni por todos los contactos."
+        },
+        {
+          "tema": "Ausencias conjuntas",
+          "prioridad": "Media",
+          "evidencia": "12 filas sin ambos teléfonos, 11 con correo. Registro 392 sin teléfono, móvil, correo ni web; 34/35 filas sin correo conservan teléfono. Ausencia de CIF no coincide con contactos incompletos.",
+          "decision": "Definir tratamiento de disponibilidad sin interpretar ausencia como inactividad; porcentajes por naturaleza no establecen causas."
+        },
+        {
+          "tema": "Cobertura de Ambito y campos sin fuente",
+          "prioridad": "Media",
+          "evidencia": "No hay clasificación para Ambito, coordenadas ni descripción explícita. CIF y naturaleza jurídica no tienen atributos dedicados; los campos opcionales admiten None, sin valores por defecto.",
+          "decision": "Acordar conservación de metadatos y valores ausentes; no asignar Ambito desde la forma jurídica ni generar descripción o coordenadas sin otra fuente."
+        }
+      ]
     }
   ]
 };
