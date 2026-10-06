@@ -11,44 +11,49 @@
   <header class="site-header">
     <div>
       <p class="eyebrow">IEI Integrations</p>
-      <h1>Mapeo de datos al esquema global</h1>
-      <p class="subtitle">Comparación de fuentes analizadas manualmente y su correspondencia con el esquema global IEI.</p>
+      <h1 data-i18n="heading">Mapeo de datos al esquema global</h1>
+      <p class="subtitle" data-i18n="subtitle">Comparación de fuentes analizadas manualmente y su correspondencia con el esquema global IEI.</p>
     </div>
     <div class="header-actions">
+      <div class="language-switch" role="group" aria-label="Idioma" data-i18n-aria="language">
+        <button type="button" data-language="es" lang="es" aria-pressed="true"><span aria-hidden="true"></span> Español</button>
+        <button type="button" data-language="en" lang="en" aria-pressed="false"><span aria-hidden="true"></span> English</button>
+      </div>
       <label class="search-box">
-        <span>Buscar</span>
-        <input id="globalSearch" type="search" placeholder="campo, estado, nota…" autocomplete="off" />
+        <span data-i18n="search">Buscar</span>
+        <input id="globalSearch" type="search" placeholder="campo, estado, nota…" data-i18n-placeholder="searchPlaceholder" autocomplete="off" />
       </label>
     </div>
   </header>
 
-  <nav class="tabs" aria-label="Secciones del informe">
-    <button class="tab-button active" data-tab="resumen">Resumen</button>
-    <button class="tab-button" data-tab="global">Mapeo global</button>
-    <button class="tab-button" data-tab="fuentes">Fuentes</button>
-    <button class="tab-button" data-tab="ambitos">Ámbitos</button>
-    <button class="tab-button" data-tab="decisiones">Decisiones</button>
+  <nav class="tabs" aria-label="Secciones del informe" data-i18n-aria="sections">
+    <button id="nav-resumen" class="tab-button active" data-tab="resumen" data-i18n="resumen" aria-controls="tab-resumen">Resumen</button>
+    <button id="nav-global" class="tab-button" data-tab="global" data-i18n="global" aria-controls="tab-global">Mapeo global</button>
+    <button id="nav-fuentes" class="tab-button" data-tab="fuentes" data-i18n="fuentes" aria-controls="tab-fuentes">Fuentes</button>
+    <button id="nav-ambitos" class="tab-button" data-tab="ambitos" data-i18n="ambitos" aria-controls="tab-ambitos">Ámbitos</button>
+    <button id="nav-comparison" class="tab-button" data-tab="comparison" data-i18n="comparison" aria-controls="tab-comparison">Comparación</button>
+    <button id="nav-decisiones" class="tab-button" data-tab="decisiones" data-i18n="decisiones" aria-controls="tab-decisiones">Decisiones</button>
   </nav>
 
   <main>
-    <section id="tab-resumen" class="tab-panel active" aria-labelledby="Resumen">
+    <section id="tab-resumen" class="tab-panel active" aria-labelledby="nav-resumen">
       <div id="summarySourceTabs" class="source-tabs"></div>
       <div id="summaryCards" class="cards"></div>
       <div class="panel-card">
-        <h2>Lectura rápida</h2>
+        <h2 data-i18n="quick">Lectura rápida</h2>
         <div id="quickSummary" class="quick-summary"></div>
       </div>
       <div class="panel-card">
-        <h2>Esquema global</h2>
+        <h2 data-i18n="schema">Esquema global</h2>
         <div id="schemaOverview" class="schema-grid"></div>
       </div>
     </section>
 
-    <section id="tab-global" class="tab-panel">
+    <section id="tab-global" class="tab-panel" aria-labelledby="nav-global">
       <div class="section-heading">
         <div>
-          <h2>Mapeo global</h2>
-          <p>Campos del esquema global y su correspondencia con cada fuente analizada.</p>
+          <h2 data-i18n="global">Mapeo global</h2>
+          <p data-i18n="globalDescription">Campos del esquema global y su correspondencia con cada fuente analizada.</p>
         </div>
         <div id="globalLegend" class="legend"></div>
       </div>
@@ -56,33 +61,48 @@
       <div id="globalMapping"></div>
     </section>
 
-    <section id="tab-fuentes" class="tab-panel">
+    <section id="tab-fuentes" class="tab-panel" aria-labelledby="nav-fuentes">
       <div class="section-heading">
         <div>
-          <h2>Fuentes</h2>
-          <p>Inventario de campos, significado, calidad observada y decisión de integración.</p>
+          <h2 data-i18n="fuentes">Fuentes</h2>
+          <p data-i18n="sourceDescription">Inventario de campos, significado, calidad observada y decisión de integración.</p>
         </div>
       </div>
       <div id="sourceTabs" class="source-tabs"></div>
       <div id="sourceInventory"></div>
     </section>
 
-    <section id="tab-ambitos" class="tab-panel">
+    <section id="tab-ambitos" class="tab-panel" aria-labelledby="nav-ambitos">
       <div class="section-heading">
         <div>
-          <h2>Mapeo de ámbitos</h2>
-          <p><strong>Ámbito</strong> = esfera o población destinataria de la entidad en el esquema global.</p>
+          <h2 data-i18n="ambitos">Ámbitos</h2>
+          <p data-i18n="ambitoDescription">Ámbito = esfera o población destinataria de la entidad en el esquema global.</p>
         </div>
       </div>
       <div id="ambitoSourceTabs" class="source-tabs"></div>
       <div id="ambitoMapping"></div>
     </section>
 
-    <section id="tab-decisiones" class="tab-panel">
+    <section id="tab-comparison" class="tab-panel" aria-labelledby="nav-comparison">
       <div class="section-heading">
         <div>
-          <h2>Decisiones abiertas</h2>
-          <p>Cuestiones que deben resolverse antes de implementar la integración definitiva.</p>
+          <h2 data-i18n="comparisonHeading">Un esquema, todas las fuentes</h2>
+          <p data-i18n="comparisonDescription">Correspondencias candidatas por campo global. Las etiquetas describen trabajo pendiente; no certifican datos validados ni una integración ejecutada.</p>
+        </div>
+      </div>
+      <div class="comparison-notice">
+        <p data-i18n="comparisonNote">Combinar = reunir campos de una misma fuente. Fusionar registros entre fuentes requiere identidad y granularidad acordadas; no se completan huecos automáticamente con otra fuente.</p>
+        <p data-i18n="typeNote">Se muestran los 16 atributos de global_schema.py, incluidas las relaciones obligatorias.</p>
+      </div>
+      <div id="comparisonLegend" class="comparison-legend"></div>
+      <div id="comparisonMapping"></div>
+    </section>
+
+    <section id="tab-decisiones" class="tab-panel" aria-labelledby="nav-decisiones">
+      <div class="section-heading">
+        <div>
+          <h2 data-i18n="decisionHeading">Decisiones abiertas</h2>
+          <p data-i18n="decisionDescription">Cuestiones que deben resolverse antes de implementar la integración definitiva.</p>
         </div>
       </div>
       <div id="decisionSourceTabs" class="source-tabs"></div>
@@ -91,11 +111,14 @@
   </main>
 
   <footer>
-    <span>IEI Integrations · informe estático</span>
-    <span>Funciona localmente y en GitHub Pages.</span>
+    <span data-i18n="footer">IEI Integrations · informe estático</span>
+    <span data-i18n="offline">Funciona localmente y en GitHub Pages.</span>
   </footer>
 
   <script src="data.js"></script>
+  <script src="comparison.js"></script>
+  <script src="i18n.js"></script>
+  <script src="data.en.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
