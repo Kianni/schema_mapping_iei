@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Mapeo de fuentes al esquema global IEI" />
+  <title>IEI · Mapeo de datos</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">IEI Integrations</p>
+      <h1>Mapeo de datos al esquema global</h1>
+      <p class="subtitle">Comparación de fuentes analizadas manualmente y su correspondencia con el esquema global IEI.</p>
+    </div>
+    <div class="header-actions">
+      <label class="search-box">
+        <span>Buscar</span>
+        <input id="globalSearch" type="search" placeholder="campo, estado, nota…" autocomplete="off" />
+      </label>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Secciones del informe">
+    <button class="tab-button active" data-tab="resumen">Resumen</button>
+    <button class="tab-button" data-tab="global">Mapeo global</button>
+    <button class="tab-button" data-tab="fuentes">Fuentes</button>
+    <button class="tab-button" data-tab="ambitos">Ámbitos</button>
+    <button class="tab-button" data-tab="decisiones">Decisiones</button>
+  </nav>
+
+  <main>
+    <section id="tab-resumen" class="tab-panel active" aria-labelledby="Resumen">
+      <div id="summarySourceTabs" class="source-tabs"></div>
+      <div id="summaryCards" class="cards"></div>
+      <div class="panel-card">
+        <h2>Lectura rápida</h2>
+        <div id="quickSummary" class="quick-summary"></div>
+      </div>
+      <div class="panel-card">
+        <h2>Esquema global</h2>
+        <div id="schemaOverview" class="schema-grid"></div>
+      </div>
+    </section>
+
+    <section id="tab-global" class="tab-panel">
+      <div class="section-heading">
+        <div>
+          <h2>Mapeo global</h2>
+          <p>Campos del esquema global y su correspondencia con cada fuente analizada.</p>
+        </div>
+        <div id="globalLegend" class="legend"></div>
+      </div>
+      <div id="globalSourceTabs" class="source-tabs"></div>
+      <div id="globalMapping"></div>
+    </section>
+
+    <section id="tab-fuentes" class="tab-panel">
+      <div class="section-heading">
+        <div>
+          <h2>Fuentes</h2>
+          <p>Inventario de campos, significado, calidad observada y decisión de integración.</p>
+        </div>
+      </div>
+      <div id="sourceTabs" class="source-tabs"></div>
+      <div id="sourceInventory"></div>
+    </section>
+
+    <section id="tab-ambitos" class="tab-panel">
+      <div class="section-heading">
+        <div>
+          <h2>Mapeo de ámbitos</h2>
+          <p><strong>Ámbito</strong> = esfera o población destinataria de la entidad en el esquema global.</p>
+        </div>
+      </div>
+      <div id="ambitoSourceTabs" class="source-tabs"></div>
+      <div id="ambitoMapping"></div>
+    </section>
+
+    <section id="tab-decisiones" class="tab-panel">
+      <div class="section-heading">
+        <div>
+          <h2>Decisiones abiertas</h2>
+          <p>Cuestiones que deben resolverse antes de implementar la integración definitiva.</p>
+        </div>
+      </div>
+      <div id="decisionSourceTabs" class="source-tabs"></div>
+      <div id="openDecisions"></div>
+    </section>
+  </main>
+
+  <footer>
+    <span>IEI Integrations · informe estático</span>
+    <span>Funciona localmente y en GitHub Pages.</span>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
