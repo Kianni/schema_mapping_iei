@@ -17,6 +17,17 @@ Análisis manual y mapeo de fuentes de datos al esquema global IEI.
 
 Abra `docs/index.html` en el navegador. Para GitHub Pages, publique la carpeta `docs/`.
 
+Antes de publicar cambios en CSS, JavaScript o datos, ejecute
+`node scripts/version-assets.cjs` y publique también el `docs/index.html` actualizado.
+Los seis archivos enlazados usan versiones calculadas a partir de su contenido
+(`?v=...`), para evitar que el navegador mezcle HTML nuevo con JavaScript antiguo.
+No cambian las rutas relativas ni el funcionamiento local.
+
+Si la página publicada no refleja un despliegue reciente, espere a que termine
+el despliegue de Pages y haga una recarga completa (`Ctrl+F5` o `Ctrl+Shift+R`).
+Compruebe que todos los archivos de `docs/` se publican, incluidos `comparison.js`,
+`i18n.js` y `data.en.js`; no basta con actualizar solo `index.html`.
+
 La pestaña **Comparación** muestra las tres fuentes a la vez: un campo global por
 fila, tipo, obligatoriedad, columnas de origen y evidencia desplegable. Incluye
 las relaciones `Entidad.en_localidad` y `Localidad.en_provincia`. Los nombres
@@ -41,6 +52,12 @@ sin esa opción también verifica navegación, comparación, búsqueda y cambio 
 en Chrome headless. Requiere Python en PATH y Chrome; se pueden indicar ejecutables
 con `IEI_PYTHON` y `IEI_CHROME`. Usa un perfil temporal aislado dentro de `docs/` y
 lo elimina al terminar.
+
+Para verificar la publicación real, ejecute
+`node scripts/check-report.cjs --url https://kianni.github.io/schema_mapping_iei/`.
+Compara los seis archivos publicados con los locales y comprueba estilos,
+errores JavaScript, traducción y tablas en Chrome con un perfil limpio.
+Esta comprobación necesita acceso a la red.
 
 ## Añadir la segunda o tercera fuente
 

@@ -117,6 +117,12 @@ const smokeScript = `
 })();`;
 const smokePath = path.join(root, 'docs/._report_smoke.html');
 const profile = path.join(root, 'docs/._report_chrome_profile');
+const urlIndex = process.argv.indexOf('--url');
+if (urlIndex !== -1) {
+  const url = new URL(process.argv[urlIndex + 1]);
+  assert.ok(['http:', 'https:'].includes(url.protocol), 'Expected an HTTP(S) report URL');
+  checkPublished(url).catch(error => { console.error(error); process.exitCode = 1; });
+} else {
 assert.ok(!fs.existsSync(smokePath) && !fs.existsSync(profile), 'Temporary paths must be new');
 try {
   fs.writeFileSync(smokePath, read('docs/index.html').replace('</body>', `<script>${smokeScript}</script></body>`), 'utf8');
@@ -132,4 +138,87 @@ try {
   // Delete only the exact, newly-created profile within docs.
   assert.equal(path.dirname(path.resolve(profile)), path.join(root, 'docs'));
   if (fs.existsSync(profile)) fs.rmSync(profile, { recursive: true, force: true });
+}
+}
+
+async function checkPublished(url) {
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const published = await fetch(url, { cache: 'no-store' });
+  assert.equal(published.status, 200, 'Published HTML status');
+  const html = await published.text();
+  const assets = [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css)(?:\?[^"]*)?)"/g)];
+  for (const [, reference] of assets) {
+    const response = await fetch(new URL(reference, url), { cache: 'no-store' });
+    assert.equal(response.status, 200, reference);
+    const content = (await response.text()).replace(/\r\n/g, '\n');
+    const name = new URL(reference, url).pathname.split('/').pop();
+    assert.equal(content, read(`docs/${name}`).replace(/\r\n/g, '\n'), `Published ${name} differs from local file`);
+    console.log(`MATCH: published ${reference}`);
+  }
+  assert.equal(assets.length, 6, 'Published stylesheet and five scripts');
+  assert.ok(!fs.existsSync(profile), 'Temporary browser profile must be new');
+  const chrome = process.env.IEI_CHROME || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+  const browser = cp.spawn(chrome, ['--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0', '--user-data-dir=' + profile, 'about:blank'], { windowsHide: true, stdio: 'ignore' });
+  let socket;
+  try {
+    const portFile = path.join(profile, 'DevToolsActivePort');
+    const deadline = Date.now() + 30000;
+    while (!fs.existsSync(portFile)) {
+      assert.ok(Date.now() < deadline, 'Chrome debugging port did not become available');
+      await sleep(100);
+    }
+    const port = fs.readFileSync(portFile, 'utf8').split(/\r?\n/)[0];
+    const pages = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
+    socket = new WebSocket(pages.find(page => page.type === 'page').webSocketDebuggerUrl);
+    await new Promise((resolve, reject) => { socket.addEventListener('open', resolve, { once: true }); socket.addEventListener('error', reject, { once: true }); });
+    let id = 0;
+    const pending = new Map();
+    const errors = [];
+    socket.addEventListener('message', event => {
+      const message = JSON.parse(event.data);
+      if (message.id) {
+        const request = pending.get(message.id);
+        if (request) { clearTimeout(request.timer); pending.delete(message.id); message.error ? request.reject(Error(message.error.message)) : request.resolve(message.result); }
+      } else if (message.method === 'Runtime.exceptionThrown') {
+        errors.push(message.params.exceptionDetails.exception?.description || message.params.exceptionDetails.text);
+      } else if (message.method === 'Network.loadingFailed') {
+        errors.push(`Network: ${message.params.errorText}`);
+      }
+    });
+    const send = (method, params = {}) => new Promise((resolve, reject) => {
+      const requestId = ++id;
+      const timer = setTimeout(() => { pending.delete(requestId); reject(Error(`Chrome timed out: ${method}`)); }, 15000);
+      pending.set(requestId, { resolve, reject, timer });
+      socket.send(JSON.stringify({ id: requestId, method, params }));
+    });
+    await send('Page.enable');
+    await send('Runtime.enable');
+    await send('Network.enable');
+    await send('Page.navigate', { url: url.href });
+    let ready = false;
+    while (Date.now() < deadline) {
+      const result = await send('Runtime.evaluate', { expression: "document.readyState === 'complete' && !!document.getElementById('comparisonMapping')", returnByValue: true });
+      if (result.result.value) { ready = true; break; }
+      await sleep(200);
+    }
+    assert.ok(ready, 'Published report did not load');
+    assert.deepEqual(errors, [], 'Published browser errors');
+    const style = await send('Runtime.evaluate', { expression: "parseFloat(getComputedStyle(document.querySelector('[data-language]')).borderRadius)", returnByValue: true });
+    assert.ok(style.result.value > 0, 'Language button CSS did not load');
+    await send('Runtime.evaluate', { expression: smokeScript });
+    const result = await send('Runtime.evaluate', { expression: "document.getElementById('report-smoke-result')?.textContent", returnByValue: true });
+    assert.ok(result.result.value?.startsWith('PASS:'), result.result.value || 'Published browser checks did not complete');
+    console.log(`PASS: published CSS and JavaScript load without errors at ${url.href}`);
+    console.log(result.result.value);
+    await send('Browser.close');
+  } finally {
+    if (socket) socket.close();
+    if (browser.exitCode === null) {
+      const closed = new Promise(resolve => browser.once('exit', resolve));
+      browser.kill();
+      await Promise.race([closed, sleep(3000)]);
+    }
+    assert.equal(path.dirname(path.resolve(profile)), path.join(root, 'docs'));
+    if (fs.existsSync(profile)) fs.rmSync(profile, { recursive: true, force: true });
+  }
 }
