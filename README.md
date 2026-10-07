@@ -1,10 +1,35 @@
 # IEI Integrations
 
-Análisis manual y mapeo de fuentes de datos al esquema global IEI.
+Análisis manual y mapeo de fuentes de datos al esquema global IEI, y presentación de los resultados en HTML interactivo.
+
+## Procesamiento manual de fuentes con pandas
+
+### entidades_CV.csv
+
+Análisis de cada columna, de las relaciones entre columnas y conclusiones por columna.
+
+Documento de origen: [entidades_CV.csv](data/entidades_CV.csv).  
+Cuaderno Jupyter: [entidades_CV.ipynb](notebooks/entidades_CV.ipynb).
+
+### datos-abiertos-csv-segundo-trimestre26.json
+
+Análisis de cada columna, de las relaciones entre columnas y conclusiones por columna.
+
+Documento de origen: [datos-abiertos-csv-segundo-trimestre26.json](data/datos-abiertos-csv-segundo-trimestre26.json).  
+Cuaderno Jupyter: [datos_abiertos.ipynb](notebooks/datos_abiertos.ipynb).
+
+### Entitats_ONGD_pretty.xml
+
+Análisis de cada columna, de las relaciones entre columnas y conclusiones por columna.
+
+Documento de origen: [Entitats_ONGD_pretty.xml](data/Entitats_ONGD_pretty.xml).  
+Cuaderno Jupyter: [entitats_xml.ipynb](notebooks/entitats_xml.ipynb).
+
+### [Página HTML interactiva](https://kianni.github.io/schema_mapping_iei/)
 
 ## Estructura
 
-- `notebooks/data_research_IEI.ipynb` — análisis manual con pandas.
+- `notebooks/entidades_CV.ipynb`, `notebooks/datos_abiertos.ipynb` y `notebooks/entitats_xml.ipynb` — análisis manual con pandas.
 - `docs/index.html` — informe interactivo.
 - `docs/data.js` — resultados del análisis.
 - `docs/data.en.js` — traducción inglesa del contenido del informe.
