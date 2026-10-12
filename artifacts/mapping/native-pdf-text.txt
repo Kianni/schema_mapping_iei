@@ -1,0 +1,2570 @@
+ 
+INTEGRACIÓN E INTEROPERABILIDAD. CURSO 2025-26 
+ 
+PLANTILLA DE DEFINICIÓN DE MAPPING SEMÁNTICO 
+Equipo de prácticas: T21.07  
+ 
+ 
+Esquema origen: CV / CAN / CAT 
+ 
+E = Entidad  L = Localidad  P = Provincia | CV = Comunitat Valenciana; CAN = Canarias; CAT = Catalunya (ONGD) 
+ 
+Fuentes: CV: entidades_CV.csv (1697 filas, 21 campos); CAN: datos-abiertos-csv-segundo-trimestre26.json (810 filas, 20 campos); CAT: 
+Entitats_ONGD_pretty.xml (765 filas, 11 campos). 
+Base: Comparación, inventario, ámbitos y decisiones de docs/data.js + docs/comparison.js; conclusiones de los tres notebooks; comprobación 
+de los archivos literales; data/global_schema.py. Nombres canónicos de Python (direccion, codigo_postal, descripcion, codigo, url). 
+Correspondencias candidatas y reglas propuestas: no se ha ejecutado ETL, limpieza, geocodificación ni fusión de registros. — indica ausencia 
+de campo/equivalencia; los opcionales aceptan None, sin que ello sea un valor por defecto. 
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+E.cod_entidad 
+CV: ni_centro; id solo para trazabilidad de fila. 
+ 
+CAN: nif (candidato si Entidad representa una 
+organización); numero_registro como 
+identificador registral auxiliar. 
+ 
+CAT: n_mero_registre (candidato registral); 
+cif_entitat como metadato fiscal auxiliar. 
+CV: Convertir cada ni_centro 
+no ausente, 
+matemáticamente entero, de 
+float a texto sin sufijo 
+decimal. Acordar tratamiento 
+de los 32 códigos ausentes; 
+no sustituir automáticamente 
+por id. 
+ 
+CAN: Preservar nif y 
+numero_registro como texto. 
+CV: ni_centro: 1665 
+valores no nulos, 32 
+ausentes; 1645 
+códigos distintos; un 
+único nombre por 
+código. 
+id: int64; completo; 
+1697 valores únicos y 
+secuenciales. 
+Los códigos repetidos 
+pueden aportar 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+Seleccionar la clave tras 
+acordar si Entidad representa 
+organización, centro, sede o 
+registro; conservar 
+trazabilidad y multiplicidad de 
+inscripciones. 
+ 
+CAT: Leer el registro literal 
+como texto, incluidos los 
+puntos. No convertir 1.005 en 
+magnitud numérica ni quitar 
+el punto sin confirmar su 
+significado. Conservar CIF 
+por separado; no usarlo 
+como clave completa ni 
+fusionar por coincidencia. 
+distintos sectores o 
+tipos de servicio. Los 
+32 registros sin 
+ni_centro tampoco 
+tienen max ni pobtotal 
+y presentan 
+clasificacion = SIN 
+RESOLUCIÓN. Campo 
+global str obligatorio: 
+decidir cuarentena, 
+clave sustituta 
+documentada o 
+representación técnica 
+separada. 
+ 
+CAN: nif: 745 únicos 
+de 810; 9 caracteres; 
+sin nulos, _U, vacíos o 
+espacios de borde; 51 
+NIF repetidos, máximo 
+7 filas. Validez fiscal no 
+comprobada. 
+numero_registro: 749 
+únicos; completo; 14 
+caracteres; todos 
+cumplen 3 letras + 4 
+dígitos + 2 letras + 5 
+dígitos. Un NIF y 
+nombre por registro; 4 
+NIF tienen dos 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+registros; frecuencia 
+máxima 7. 
+Cada NIF tiene una 
+denominación y cada 
+registro un 
+NIF/nombre; 741 NIF 
+tienen una inscripción 
+y cuatro tienen dos. No 
+eliminar filas por NIF o 
+registro: pueden 
+aportar sedes, 
+direcciones, áreas y 
+subáreas distintas. 
+ 
+CAT: n_mero_registre: 
+765 valores no nulos; 
+todos únicos en 
+pandas y en el XML 
+literal. Registro y 
+nombre tienen relación 
+uno a uno en este 
+archivo. pandas infiere 
+float64: 738 textos 
+contienen solo dígitos 
+y 27 un punto seguido 
+de tres dígitos, por 
+ejemplo 1.005. El 
+punto podría separar 
+miles; su significado no 
+está confirmado. No se 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+interpreta como 
+magnitud ni se corrige. 
+Al excluir registro, 
+nombre y CIF, no hay 
+dos filas iguales en 
+todos los demás 
+campos. Candidato a 
+Entidad.cod_entidad 
+(str). Quedan abiertas 
+la unicidad entre 
+fuentes y la 
+representación final. 
+cif_entitat: 682 valores 
+informados, 83 
+ausentes (10,8%) y 
+680 CIF distintos. 
+Todos los textos 
+informados tienen 
+nueve caracteres. 681 
+cumplen el patrón 
+orientativo de 
+organización. 
+46414697F tiene forma 
+similar a DNI; no se 
+valida control ni 
+identidad jurídica. Dos 
+CIF repetidos afectan a 
+cuatro filas. Ambos 
+grupos difieren en 
+registro, nombre, 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+dirección, código 
+postal, municipio, móvil 
+y correo. G55258909 
+también difiere en 
+naturaleza (Associació 
+/ Federació) y 
+disponibilidad de 
+teléfono. G10932812 
+tiene Associació en 
+ambas filas y carece 
+de teléfono en las dos. 
+Las cuatro carecen de 
+web. La comparación 
+completa no determina 
+si son organizaciones 
+relacionadas o errores 
+de fuente. Compartir 
+CIF no basta para 
+fusionar. No es clave 
+completa y única; no 
+hay atributo CIF/NIF 
+específico en el 
+esquema. 
+Unicidad local no 
+acredita identidad 
+entre fuentes. Ambos 
+grupos de CIF repetido 
+difieren también en 
+código postal, 
+municipio, móvil y 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+correo; no se 
+determina relación 
+jurídica o error. 
+Conclusión conjunta: 
+CV describe centros; 
+CAN y CAT describen 
+organizaciones/inscripc
+iones. No equiparar 
+automáticamente 
+ni_centro, nif, CIF y 
+registros ni completar 
+huecos entre fuentes 
+sin clave y 
+granularidad 
+acordadas. 
+E.nombre 
+CV: nombre 
+ 
+CAN: denominacion 
+ 
+CAT: nom_de_l_entitat 
+CV: Copiar el nombre 
+original. Normalizar espacios 
+únicamente si fuera 
+necesario y conservar la 
+grafía de origen. 
+ 
+CAN: Copiar el original; 
+señalar posibles 
+truncamientos y erratas. 
+Corregir solo con evidencia 
+de la fuente. 
+ 
+CAT: Copiar el nombre literal. 
+No reconstruir espacios ni 
+CV: nombre: Completo; 
+1660 nombres 
+distintos; 27 nombres 
+repetidos afectan a 64 
+registros. 
+No hay filas 
+completamente 
+duplicadas al excluir id. 
+Un mismo nombre 
+puede corresponder a 
+centros diferentes; no 
+usar nombre como 
+clave. 
+ 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+completar palabras por 
+conjetura. 
+CAN: denominacion: 
+745 únicos; longitudes 
+5–124; sin 
+nulos/vacíos/espacios 
+de borde; 
+normalización 
+mantiene 745 únicos. 
+Filas 157, 319, 457 con 
+finales posiblemente 
+truncados, 99–100 
+caracteres, 
+confirmados en JSON; 
+errata posible Otrtas. 
+Frecuencia máxima: 
+siete filas. Longitudes 
+sospechosas en 
+índices 157/319/457: 
+99/100/100, también 
+en JSON; hay nombres 
+de hasta 124, por lo 
+que no se establece un 
+límite universal de 100. 
+Nombre–NIF uno a 
+uno en este archivo, 
+nombre–registro uno a 
+varios. 
+ 
+CAT: nom_de_l_entitat: 
+765 nombres 
+informados y distintos; 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+longitudes de 5 a 165. 
+Sin espacios 
+iniciales/finales. 764 
+nombres no contienen 
+caracteres de espacio; 
+el restante contiene un 
+salto de línea. Todos 
+coinciden con el XML 
+literal. Hay palabras 
+concatenadas, como 
+AccióSolidàriadelVallès
+, que pueden dificultar 
+lectura y comparación. 
+Los nombres de una 
+palabra no requieren 
+espacios. Se muestran 
+longitudes extremas y 
+finales para 
+inspección; estas 
+comprobaciones no 
+demuestran 
+truncamiento. 
+Candidato a 
+Entidad.nombre; su 
+unicidad aquí no 
+demuestra identidad 
+universal. 
+No se demuestra 
+truncamiento mediante 
+longitudes/extremos. 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+Campo global str 
+obligatorio; unicidad en 
+un archivo no garantiza 
+identidad universal. 
+E.ambito = "MAYORES" 
+CV: sector = "PERSONAS MAYORES" 
+ 
+CAN: area_nombre = "Tercera Edad" (area_id 
+auxiliar). 
+ 
+CAT: —; no hay categoría explícita de actividad 
+o población destinataria. 
+CV: Mapear la categoría 
+explícita a MAYORES. 
+ 
+CAN: Equivalencia 
+semántica propuesta: 
+mapear "Tercera Edad" a 
+MAYORES; conservar otros 
+ámbitos y detalle de 
+subáreas. 
+ 
+CAT: Sin correspondencia: no 
+inferir este valor del nombre, 
+de naturalesa ni de 
+pertenecer al registro ONGD. 
+Ambito puede conservarse 
+como None. 
+CV: Correspondencia 
+semántica directa. 743 
+filas con esta categoría 
+(no centros únicos). 
+Usar sector, no 
+clasificacion: coinciden 
+en 1665 filas; en las 
+otras 32 clasificacion = 
+SIN RESOLUCIÓN 
+pero sector sigue 
+informado. 
+ 
+CAN: Correspondencia 
+semántica propuesta; 
+conservar múltiples 
+ámbitos. 98 filas en el 
+área (no 
+organizaciones 
+únicas). 
+Criterio común para las 
+12 filas de Ambito: el 
+esquema Python 
+acepta un único 
+Ambito | None. CV 
+tiene 12 centros con 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+varios sectores (10 con 
+dos y dos con tres); 
+CAN tiene 729 NIF con 
+un área, 14 con dos, 
+uno con tres y uno con 
+cinco. Sus 33 grupos 
+NIF–área con varias 
+subáreas se 
+distribuyen en 29 con 
+dos, tres con tres y uno 
+con seis (otros 341 
+tienen una). Acordar 
+representación sin 
+pérdida o ampliación 
+del modelo; no 
+seleccionar un ámbito 
+arbitrario ni confundir 
+múltiples filas con 
+duplicados. CAN: 
+nueve áreas con 
+correspondencia 
+código–nombre uno a 
+uno; 16 subáreas 
+conocidas, 394 
+marcadores _U. Los 
+códigos 1–7 
+pertenecen a 
+Voluntariado y A–I a 
+Varios; _U no es 
+categoría. Varios/ I = 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+Otros, C = Asociación 
+De Igualdad Lgtbi, F = 
+Asocaciones 
+Relacionadas Con 
+Ciencia Tecnología 
+Investigación E 
+Innovación Medio 
+Ambiente Ecología 
+Patrimonio 
+HistóricO-Cultural, G = 
+Asociaciones De 
+Trabajadores 
+Empresarios 
+Sindicatos Colegios 
+Profesionales 
+Universidades: no 
+tienen equivalencia 
+cerrada documentada; 
+preservar estas 
+subáreas y las 
+restantes mixtas sin 
+forzarlas al enum. 
+ 
+CAT: naturalesa 
+representa forma 
+jurídica/organizativa, 
+no ámbito de 
+actuación; no existe 
+evidencia para asignar 
+este valor del enum. 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+E.ambito = "DISCAPACIDAD" 
+CV: sector = "PERSONAS CON 
+DISCAPACIDAD" 
+ 
+CAN: area_nombre = "Discapacidad" (area_id 
+auxiliar). 
+ 
+CAT: —; no hay categoría explícita de actividad 
+o población destinataria. 
+CV: Mapear la categoría 
+explícita a DISCAPACIDAD. 
+ 
+CAN: Equivalencia 
+semántica propuesta: 
+mapear "Discapacidad" a 
+DISCAPACIDAD; conservar 
+otros ámbitos y detalle de 
+subáreas. 
+ 
+CAT: Sin correspondencia: no 
+inferir este valor del nombre, 
+de naturalesa ni de 
+pertenecer al registro ONGD. 
+Ambito puede conservarse 
+como None. 
+CV: Correspondencia 
+semántica directa. 419 
+filas con esta categoría 
+(no centros únicos). 
+ 
+CAN: Correspondencia 
+semántica propuesta; 
+conservar múltiples 
+ámbitos. 73 filas en el 
+área (no 
+organizaciones 
+únicas). 
+ 
+CAT: naturalesa 
+representa forma 
+jurídica/organizativa, 
+no ámbito de 
+actuación; no existe 
+evidencia para asignar 
+este valor del enum. 
+E.ambito = "SALUD_MENTAL" 
+CV: sector = "PERSONAS CON ENFERMEDAD 
+MENTAL" 
+ 
+CAN: —; ninguna categoría explícita 
+equivalente. 
+ 
+CAT: —; no hay categoría explícita de actividad 
+o población destinataria. 
+CV: Mapear la categoría 
+explícita a SALUD_MENTAL. 
+ 
+CAN: Sin equivalencia 
+explícita; no inferir 
+SALUD_MENTAL de 
+Drogodependencia. 
+ 
+CV: Correspondencia 
+semántica directa. 244 
+filas con esta categoría 
+(no centros únicos). 
+ 
+CAN: Sin categoría 
+explícita equivalente; 
+no inferir de 
+Drogodependencia. 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+CAT: Sin correspondencia: no 
+inferir este valor del nombre, 
+de naturalesa ni de 
+pertenecer al registro ONGD. 
+Ambito puede conservarse 
+como None. 
+ 
+CAT: naturalesa 
+representa forma 
+jurídica/organizativa, 
+no ámbito de 
+actuación; no existe 
+evidencia para asignar 
+este valor del enum. 
+E.ambito = 
+"INFANCIA_Y_JUVENTUD" 
+CV: sector = "INFANCIA" 
+ 
+CAN: area_nombre = "Menores Y Juventud" 
+(area_id auxiliar). 
+ 
+CAT: —; no hay categoría explícita de actividad 
+o población destinataria. 
+CV: Mapear la categoría 
+explícita a 
+INFANCIA_Y_JUVENTUD. 
+ 
+CAN: Equivalencia 
+semántica propuesta: 
+mapear "Menores Y 
+Juventud" a 
+INFANCIA_Y_JUVENTUD; 
+conservar otros ámbitos y 
+detalle de subáreas. 
+ 
+CAT: Sin correspondencia: no 
+inferir este valor del nombre, 
+de naturalesa ni de 
+pertenecer al registro ONGD. 
+Ambito puede conservarse 
+como None. 
+CV: La categoría de 
+origen es más 
+estrecha, pero es la 
+correspondencia 
+directa disponible. 5 
+filas con esta categoría 
+(no centros únicos). 
+ 
+CAN: Correspondencia 
+semántica propuesta; 
+conservar múltiples 
+ámbitos. 57 filas en el 
+área (no 
+organizaciones 
+únicas). 
+ 
+CAT: naturalesa 
+representa forma 
+jurídica/organizativa, 
+no ámbito de 
+actuación; no existe 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+evidencia para asignar 
+este valor del enum. 
+E.ambito = "MUJER" 
+CV: sector = "MUJERES" 
+ 
+CAN: area_nombre = "Mujer" (area_id auxiliar). 
+ 
+CAT: —; no hay categoría explícita de actividad 
+o población destinataria. 
+CV: Mapear la categoría 
+explícita a MUJER. 
+ 
+CAN: Equivalencia 
+semántica propuesta: 
+mapear "Mujer" a MUJER; 
+conservar otros ámbitos y 
+detalle de subáreas. 
+ 
+CAT: Sin correspondencia: no 
+inferir este valor del nombre, 
+de naturalesa ni de 
+pertenecer al registro ONGD. 
+Ambito puede conservarse 
+como None. 
+CV: Correspondencia 
+semántica directa. 2 
+filas con esta categoría 
+(no centros únicos). 
+ 
+CAN: Correspondencia 
+semántica propuesta; 
+conservar múltiples 
+ámbitos. 38 filas en el 
+área (no 
+organizaciones 
+únicas). 
+ 
+CAT: naturalesa 
+representa forma 
+jurídica/organizativa, 
+no ámbito de 
+actuación; no existe 
+evidencia para asignar 
+este valor del enum. 
+E.ambito = "MIGRACION" 
+CV: sector = "PERSONAS MIGRANTES" 
+ 
+CAN: area_nombre = "Varios"; subarea_id = 
+"D", subarea_nombre = "Migración" 
+ 
+CV: Mapear la categoría 
+explícita a MIGRACION. 
+ 
+CAN: Usar solo la subárea 
+explícita Varios / D = 
+Migración; equivalencia 
+CV: Correspondencia 
+semántica directa. 41 
+filas con esta categoría 
+(no centros únicos). 
+ 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+CAT: —; no hay categoría explícita de actividad 
+o población destinataria. 
+propuesta pendiente de 
+revisión. No aplicar 
+MIGRACION a todo Varios. 
+ 
+CAT: Sin correspondencia: no 
+inferir este valor del nombre, 
+de naturalesa ni de 
+pertenecer al registro ONGD. 
+Ambito puede conservarse 
+como None. 
+CAN: Subárea 
+explícita; no aplicar a 
+todo Varios. Filas por 
+subárea: Varios/D: 10. 
+ 
+CAT: naturalesa 
+representa forma 
+jurídica/organizativa, 
+no ámbito de 
+actuación; no existe 
+evidencia para asignar 
+este valor del enum. 
+E.ambito = 
+"INCLUSION_SOCIAL" 
+CV: sector = "POBLACIÓN EN GENERAL Y 
+COLECTIVOS SOCIALMENTE 
+DESFAVORECIDOS" 
+ 
+CAN: area_nombre = "Exclusión Social" 
+(area_id auxiliar). 
+ 
+CAT: —; no hay categoría explícita de actividad 
+o población destinataria. 
+CV: Mapear la categoría 
+explícita a 
+INCLUSION_SOCIAL. 
+ 
+CAN: Equivalencia 
+semántica propuesta: 
+mapear "Exclusión Social" a 
+INCLUSION_SOCIAL; 
+conservar otros ámbitos y 
+detalle de subáreas. 
+ 
+CAT: Sin correspondencia: no 
+inferir este valor del nombre, 
+de naturalesa ni de 
+pertenecer al registro ONGD. 
+Ambito puede conservarse 
+como None. 
+CV: Mejor 
+correspondencia 
+dentro del enum global 
+actual. 243 filas con 
+esta categoría (no 
+centros únicos). 
+ 
+CAN: Correspondencia 
+semántica propuesta; 
+conservar múltiples 
+ámbitos. 23 filas en el 
+área (no 
+organizaciones 
+únicas). 
+ 
+CAT: naturalesa 
+representa forma 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+jurídica/organizativa, 
+no ámbito de 
+actuación; no existe 
+evidencia para asignar 
+este valor del enum. 
+E.ambito = 
+"EDUCACION_Y_FORMACION
+" 
+CV: —; ningún sector equivalente identificado. 
+ 
+CAN: area_nombre = "Voluntariado"; 
+subarea_id = "4", subarea_nombre = 
+"Educación Ciencia Cultura Deportes Y 
+Patrimonio HistóricO-Artístico" 
+ 
+CAT: —; no hay categoría explícita de actividad 
+o población destinataria. 
+CV: Sin correspondencia; 
+conservar ausencia de dato 
+para este valor. 
+ 
+CAN: Correspondencia 
+candidata, pendiente de 
+revisión semántica para 
+EDUCACION_Y_FORMACI
+ON. Usar la pareja 
+área–subárea, sin asignar 
+por el área genérica sola. 
+ 
+CAT: Sin correspondencia: no 
+inferir este valor del nombre, 
+de naturalesa ni de 
+pertenecer al registro ONGD. 
+Ambito puede conservarse 
+como None. 
+CV: No existe un 
+sector de origen 
+equivalente. 
+ 
+CAN: Subárea mezcla 
+educación, ciencia, 
+cultura y deportes; 
+revisar. Filas por 
+subárea: 
+Voluntariado/4: 20. La 
+subárea 4 no es 
+exclusivamente 
+educativa: ciencia, 
+cultura, deportes y 
+patrimonio se solapan 
+con otros valores 
+globales. 
+ 
+CAT: naturalesa 
+representa forma 
+jurídica/organizativa, 
+no ámbito de 
+actuación; no existe 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+evidencia para asignar 
+este valor del enum. 
+E.ambito = 
+"EMPLEO_E_INSERCION_LAB
+ORAL" 
+CV: —; ningún sector equivalente identificado. 
+ 
+CAN: area_nombre = "Varios"; subarea_id = 
+"B", subarea_nombre = "Comedores Sociales 
+Casas Hogar Comunidades Religiosas Talleres 
+Sociales Desarrollo Social E Inserción Social Y 
+Fomento Y Empleo" Candidato adicional: 
+area_nombre = "Centros Ocupacionales". 
+ 
+CAT: —; no hay categoría explícita de actividad 
+o población destinataria. 
+CV: Sin correspondencia; 
+conservar ausencia de dato 
+para este valor. 
+ 
+CAN: Correspondencia 
+candidata, pendiente de 
+revisión semántica para 
+EMPLEO_E_INSERCION_L
+ABORAL. Usar la pareja 
+área–subárea, sin asignar 
+por el área genérica sola. No 
+equiparar todo centro 
+ocupacional con inserción 
+laboral ni todo Varios / B con 
+empleo. 
+ 
+CAT: Sin correspondencia: no 
+inferir este valor del nombre, 
+de naturalesa ni de 
+pertenecer al registro ONGD. 
+Ambito puede conservarse 
+como None. 
+CV: No existe un 
+sector de origen 
+equivalente. 
+ 
+CAN: No asumir 
+inserción laboral por 
+centro ocupacional; B 
+mezcla servicios e 
+inclusión. Filas por 
+subárea: Varios/B: 90. 
+Centros 
+Ocupacionales: una 
+fila. B combina 
+comedores, casas 
+hogar, comunidades 
+religiosas, talleres, 
+desarrollo/inserción 
+social y 
+fomento/empleo. 
+ 
+CAT: naturalesa 
+representa forma 
+jurídica/organizativa, 
+no ámbito de 
+actuación; no existe 
+evidencia para asignar 
+este valor del enum. 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+E.ambito = 
+"SALUD_Y_ATENCION_SOCIO
+SANITARIA" 
+CV: —; ningún sector equivalente identificado. 
+ 
+CAN: area_nombre = "Varios"; subarea_id = 
+"H", subarea_nombre = "Asociaciones De 
+Enfermos Ongs Relacionadas Con El Área 
+SociO-Sanitaria Organizaciones Relacionadas 
+Con Autoayuda Terapias Y Salud" Candidatos 
+adicionales: area_nombre = 
+"Drogodependencia"; Voluntariado / subarea_id 
+= "3", subarea_nombre = "Asuntos Sanitarios". 
+ 
+CAT: —; no hay categoría explícita de actividad 
+o población destinataria. 
+CV: Sin correspondencia; 
+conservar ausencia de dato 
+para este valor. 
+ 
+CAN: Correspondencia 
+candidata, pendiente de 
+revisión semántica para 
+SALUD_Y_ATENCION_SOC
+IOSANITARIA. Usar la pareja 
+área–subárea, sin asignar 
+por el área genérica sola. 
+ 
+CAT: Sin correspondencia: no 
+inferir este valor del nombre, 
+de naturalesa ni de 
+pertenecer al registro ONGD. 
+Ambito puede conservarse 
+como None. 
+CV: No existe un 
+sector de origen 
+equivalente. 
+ 
+CAN: Candidatos más 
+amplios; revisar 
+alcance. Filas por 
+subárea: Varios/H: 41. 
+Drogodependencia: 
+dos filas; 
+Voluntariado/3: ocho. 
+Sus alcances son 
+distintos; validar antes 
+de agrupar. 
+ 
+CAT: naturalesa 
+representa forma 
+jurídica/organizativa, 
+no ámbito de 
+actuación; no existe 
+evidencia para asignar 
+este valor del enum. 
+E.ambito = 
+"VOLUNTARIADO_Y_PARTICI
+PACION_COMUNITARIA" 
+CV: —; ningún sector equivalente identificado. 
+ 
+CAN: area_nombre = "Voluntariado" (area_id 
+auxiliar). 
+ 
+CAT: —; no hay categoría explícita de actividad 
+o población destinataria. 
+CV: Sin correspondencia; 
+conservar ausencia de dato 
+para este valor. 
+ 
+CAN: Equivalencia 
+semántica propuesta: 
+mapear "Voluntariado" a 
+CV: No existe un 
+sector de origen 
+equivalente. 
+ 
+CAN: Correspondencia 
+semántica propuesta; 
+conservar múltiples 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+VOLUNTARIADO_Y_PARTI
+CIPACION_COMUNITARIA; 
+conservar otros ámbitos y 
+detalle de subáreas. 
+ 
+CAT: Sin correspondencia: no 
+inferir este valor del nombre, 
+de naturalesa ni de 
+pertenecer al registro ONGD. 
+Ambito puede conservarse 
+como None. 
+ámbitos. 104 filas en el 
+área (no 
+organizaciones 
+únicas). Las subáreas 
+1–7 conservan 
+cooperación/solidarida
+d internacional, 
+servicios sociales, 
+asuntos sanitarios, 
+educación/ciencia/cultu
+ra/deportes/patrimonio, 
+medio ambiente/medio 
+rural, protección civil y 
+otros campos de 
+voluntariado. No 
+perder ese detalle al 
+mapear el área. 
+ 
+CAT: naturalesa 
+representa forma 
+jurídica/organizativa, 
+no ámbito de 
+actuación; no existe 
+evidencia para asignar 
+este valor del enum. 
+E.ambito = 
+"CULTURA_Y_DESARROLLO_
+COMUNITARIO" 
+CV: —; ningún sector equivalente identificado. 
+ 
+CAN: area_nombre = "Varios"; subarea_id = 
+"A", subarea_nombre = "Asociaciones De 
+CV: Sin correspondencia; 
+conservar ausencia de dato 
+para este valor. 
+ 
+CV: No existe un 
+sector de origen 
+equivalente. 
+ 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+Vecinos Y Juveniles"; subarea_id = "E", 
+subarea_nombre = "Asociaciones Culturales 
+Deportivas SociO-Educativas SociO-Culturales" 
+Candidato adicional: Voluntariado / subarea_id 
+= "4", subarea_nombre = "Educación Ciencia 
+Cultura Deportes Y Patrimonio 
+HistóricO-Artístico". 
+ 
+CAT: —; no hay categoría explícita de actividad 
+o población destinataria. 
+CAN: Correspondencia 
+candidata, pendiente de 
+revisión semántica para 
+CULTURA_Y_DESARROLL
+O_COMUNITARIO. Usar la 
+pareja área–subárea, sin 
+asignar por el área genérica 
+sola. 
+ 
+CAT: Sin correspondencia: no 
+inferir este valor del nombre, 
+de naturalesa ni de 
+pertenecer al registro ONGD. 
+Ambito puede conservarse 
+como None. 
+CAN: Categorías 
+compuestas; revisar. 
+Filas por subárea: 
+Varios/A: 2, Varios/E: 
+86. Voluntariado/4: 20 
+filas. A incluye jóvenes 
+y E incluye deporte y 
+aspectos 
+socioeducativos; 
+ninguna equivalencia 
+es exclusiva. 
+ 
+CAT: naturalesa 
+representa forma 
+jurídica/organizativa, 
+no ámbito de 
+actuación; no existe 
+evidencia para asignar 
+este valor del enum. 
+E.direccion 
+CV: domici 
+ 
+CAN: direccion_tipo_via + 
+direccion_nombre_via + direccion_numero + 
+direccion_complemento 
+ 
+CAT: adre_a 
+CV: Copiar texto libre. 
+Normalización opcional y 
+documentada de 
+abreviaturas; preservar 
+original. 
+ 
+CAN: Componer solo tras 
+revisar componentes ya 
+incluidos en 
+direccion_nombre_via, para 
+CV: domici: 1689 
+valores no nulos, 8 
+ausentes; 1576 
+direcciones distintas; 
+formato heterogéneo. 
+Longitudes 6–84; sin 
+espacios de borde ni 
+vacíos tras strip. 
+Dirección global str 
+obligatoria: los ocho 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+evitar repetir tipo/número. 
+Mantener números, letras, 
+rangos, S/n y detalles como 
+texto. Acordar tratamiento de 
+_U, Null y - - - -; normalizar 
+espacios sin perder 
+información. Definir 
+representación de varias 
+sedes/direcciones por NIF. 
+ 
+CAT: Copiar texto literal; no 
+reconstruir espacios ni 
+separar componentes sin 
+evidencia de la fuente 
+anterior. 
+ausentes necesitan 
+una política explícita. 
+ 
+CAN: 
+direccion_tipo_via: 23 
+valores; sin nulos/_U; 
+49 vacíos tras strip. 
+Tipo puede aparecer u 
+omitirse en nombre_via 
+tanto con tipo 
+informado como vacío. 
+direccion_nombre_via: 
+685 únicos; longitudes 
+1–76; sin 
+nulos/_U/vacíos/espaci
+os de borde. Un texto 
+Null; valor D ambiguo. 
+Incluye números, 
+edificios, localidades e 
+instrucciones; 
+variantes y espacios 
+internos. 
+direccion_numero: 133 
+únicos; sin 
+nulos/_U/vacíos/espaci
+os de borde. S/n: 57, 
+S/n.: 2; letras, rangos y 
+varios números. 
+direccion_complement
+o: 180 únicos; 488 _U; 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+70 valores con 
+espacios de borde; 
+strip reduce únicos a 
+166. Abreviaturas y 
+espacios internos; - - - 
+- como marcador 
+posible. 
+Sin nulos técnicos en 
+los componentes, pero 
+los marcadores 
+pueden ser ausencias 
+semánticas. _U no 
+tiene significado exacto 
+confirmado. Una 
+organización puede 
+tener varias 
+direcciones; no 
+escoger una 
+arbitrariamente. 
+ 
+CAT: adre_a: 765 
+direcciones informadas 
+y 755 distintas; 
+longitudes de 7 a 66. 
+Ninguna contiene 
+caracteres de espacio. 
+Palabras y 
+componentes unidos, 
+como 
+PladelVinyet,9BlocDbai
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+xos; puntuación y 
+separación variables, 
+ya en el XML. 10 
+direcciones aparecen 
+dos veces (20 filas). 
+Cada pareja comparte 
+municipio y código 
+postal, pero tiene 
+registros y nombres 
+distintos. Siete parejas 
+tienen dos CIF 
+conocidos distintos; en 
+tres falta uno de los 
+CIF. Las tablas 
+comparan los demás 
+campos. Compartir 
+dirección no demuestra 
+duplicación. Candidato 
+a Entidad.direccion; no 
+se reconstruyen 
+componentes. 
+El original XML ya 
+contiene las palabras 
+concatenadas; no se 
+ha establecido la 
+causa. Siete parejas 
+de dirección 
+compartida tienen CIF 
+distintos y en tres falta 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+uno; no deduplicar por 
+dirección. 
+E.codigo_postal 
+CV: — 
+ 
+CAN: — 
+ 
+CAT: codi_postal 
+CV: Sin campo; conservar 
+None salvo enriquecimiento 
+acordado. 
+ 
+CAN: Sin campo; conservar 
+None. No usar 
+direccion_municipio_id como 
+código postal. 
+ 
+CAT: Tomar el texto literal de 
+cinco dígitos del XML como 
+str, conservando ceros 
+iniciales. Evitar inferencia 
+int64. Revisar discrepancias 
+con evidencia; no reemplazar 
+00800 por 08800 por 
+conjetura. 
+CV: No hay código 
+postal en la fuente. 
+ 
+CAN: No hay campo 
+equivalente 
+identificado. El código 
+municipal no es postal. 
+ 
+CAT: codi_postal: 765 
+valores completos y 
+209 distintos. Todos los 
+textos XML tienen 
+cinco dígitos; 618 
+empiezan por cero. 
+pandas infiere int64 y 
+pierde ceros iniciales 
+en la representación 
+cargada. 00800 se 
+observa como 800 en 
+el registro 540; su 
+exactitud geográfica no 
+está comprobada. Seis 
+códigos aparecen con 
+varios municipios: 
+08197, 08227, 08293, 
+08330, 08902, 08930. 
+Se muestra contexto 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+de nombre y dirección 
+para revisión. 21 
+municipios tienen 
+varios códigos. La 
+relación no es uno a 
+uno y por sí sola no 
+demuestra errores. 
+Candidato a 
+Entidad.codigo_postal 
+(str | None), no 
+Localidad.codigo. No 
+se restauran ceros ni 
+se cambian códigos. 
+El registro 540 tiene 
+00800, frente a 08800 
+en otras dos filas de 
+VilanovailaGeltrú: 
+revisión pendiente, sin 
+establecer el código 
+correcto. Global str | 
+None. 
+E.longitud 
+CV: x_25830 + y_25830; WKT auxiliar con el 
+mismo punto. 
+ 
+CAN: — 
+ 
+CAT: — 
+CV: Transformar el punto de 
+EPSG:25830 al CRS 
+geográfico acordado 
+(habitualmente EPSG:4326) 
+y tomar la longitud resultante 
+como float. Confirmar 
+primero CRS objetivo y orden 
+CV: Los 1697 puntos 
+WKT coinciden 
+exactamente con 
+x_25830/y_25830. 
+WKT no añade 
+información ni necesita 
+destino global propio. 
+El esquema define 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+de ejes; no copiar X/Y 
+proyectadas directamente. 
+ 
+CAN: Sin coordenada de 
+origen; conservar None. 
+Cualquier geocodificación 
+requeriría una etapa de 
+enriquecimiento acordada. 
+ 
+CAT: Sin coordenada de 
+origen; conservar None. No 
+presentar geocodificación 
+externa desde 
+adre_a/municipi como dato 
+ya obtenido. 
+float | None pero no 
+especifica CRS; la 
+conversión es una 
+regla propuesta, no 
+ejecutada. 
+ 
+CAN: No hay 
+coordenadas ni 
+geometría equivalentes 
+en los 20 campos. Las 
+direcciones y 
+localidades requieren 
+revisión antes de 
+cualquier 
+enriquecimiento 
+geográfico. 
+ 
+CAT: No hay 
+coordenadas ni 
+geometrías en los 11 
+campos. Dirección y 
+municipio 
+concatenados no 
+acreditan ubicación 
+geográfica precisa. 
+E.latitud 
+CV: x_25830 + y_25830; WKT auxiliar con el 
+mismo punto. 
+ 
+CAN: — 
+CV: Transformar el punto de 
+EPSG:25830 al CRS 
+geográfico acordado 
+(habitualmente EPSG:4326) 
+CV: Los 1697 puntos 
+WKT coinciden 
+exactamente con 
+x_25830/y_25830. 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+ 
+CAT: — 
+y tomar la latitud resultante 
+como float. Confirmar 
+primero CRS objetivo y orden 
+de ejes; no copiar X/Y 
+proyectadas directamente. 
+ 
+CAN: Sin coordenada de 
+origen; conservar None. 
+Cualquier geocodificación 
+requeriría una etapa de 
+enriquecimiento acordada. 
+ 
+CAT: Sin coordenada de 
+origen; conservar None. No 
+presentar geocodificación 
+externa desde 
+adre_a/municipi como dato 
+ya obtenido. 
+WKT no añade 
+información ni necesita 
+destino global propio. 
+El esquema define 
+float | None pero no 
+especifica CRS; la 
+conversión es una 
+regla propuesta, no 
+ejecutada. 
+ 
+CAN: No hay 
+coordenadas ni 
+geometría equivalentes 
+en los 20 campos. Las 
+direcciones y 
+localidades requieren 
+revisión antes de 
+cualquier 
+enriquecimiento 
+geográfico. 
+ 
+CAT: No hay 
+coordenadas ni 
+geometrías en los 11 
+campos. Dirección y 
+municipio 
+concatenados no 
+acreditan ubicación 
+geográfica precisa. 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+E.descripcion 
+CV: —; tipo_centro, entidad, leyenda y max son 
+metadatos distintos. 
+ 
+CAN: —; áreas/subáreas e isla son metadatos 
+distintos. 
+ 
+CAT: —; naturalesa es naturaleza jurídica. 
+CV: Sin descripción libre de 
+origen; conservar None. 
+Mantener metadatos sin 
+destino por separado o 
+ampliar el modelo. 
+ 
+CAN: Sin descripción libre; 
+conservar None. No convertir 
+automáticamente categorías 
+de actividad o isla en 
+descripción. 
+ 
+CAT: Sin descripción 
+explícita; conservar None. No 
+generarla a partir del nombre 
+o de naturalesa. 
+CV: tipo_centro: La 
+mayoría de los centros 
+tienen un tipo; 9 
+centros tienen varios y 
+uno llega a 7. 
+entidad: Una 
+organización puede 
+estar asociada a 
+muchos centros. 
+GENERALITAT 
+VALENCIANA: 141 
+registros y 134 
+nombres de centro. 
+leyenda: 9 categorías; 
+21 organizaciones 
+tienen dos valores; 
+mezcla niveles de 
+especificidad. 
+max: 1665 valores no 
+nulos, 32 ausentes; 
+rango 0–356; mediana 
+20; significado 
+semántico no 
+confirmado. 
+f_resolu: 1574 no 
+nulos, 123 ausentes; 
+todos parseables; 12 
+registros recientes 
+contienen hora distinta 
+de 00:00:00. 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+tipo_centro tiene 64 
+categorías; 1636 
+centros tienen un tipo y 
+nueve varios (seis con 
+dos, uno con tres, uno 
+con cuatro y uno con 
+siete). entidad 
+representa al 
+responsable, no al 
+centro; dos nombres 
+se asocian a más de 
+una entidad y 
+corresponden a 
+centros distintos. max: 
+147 valores, 395 ceros; 
+significado de 
+capacidad/plazas no 
+confirmado. f_resolu: 
+1574 fechas 
+parseables, 123 
+ausentes, 1562 a 
+medianoche y 12 con 
+hora en 2026; intervalo 
+1977-12-31–2026-08-0
+4. No reducir a DATE 
+sin confirmar 
+significado. Estos 
+atributos no tienen 
+destinos propios en el 
+esquema actual. 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+ 
+CAN: No existe campo 
+descriptivo explícito. 
+Área y subárea 
+determinan candidatos 
+para Ambito; 
+direccion_isla_id/nomb
+re y numero_registro 
+carecen de atributos 
+dedicados y deben 
+conservarse como 
+metadatos, sin sustituir 
+semánticamente 
+descripcion. 
+ 
+CAT: naturalesa: 
+Campo categórico 
+completo: 12 valores; 
+Associació aparece en 
+536 filas y Fundació en 
+132. Etiquetas 
+compuestas sin 
+espacios, como 
+AssociacióEstatal; no 
+es anomalía en 
+etiquetas de una 
+palabra. Ausencias por 
+naturaleza: CIF en 
+73/536 asociaciones 
+(13,6%) y 9/132 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+fundaciones (6,8%); 
+móvil en 127/536 
+(23,7%) y 58/132 
+(43,9%), 
+respectivamente. Se 
+muestran tamaños y 
+porcentajes por grupo. 
+Las categorías 
+pequeñas no permiten 
+generalizaciones ni 
+conclusiones causales. 
+Describe naturaleza 
+jurídica/organizativa, 
+no Ambito. No hay 
+atributo específico en 
+el esquema. 
+No hay atributo jurídico 
+dedicado. 
+Asociaciones: 536; 
+fundaciones: 132. CIF 
+ausente en 73/536 
+asociaciones y 9/132 
+fundaciones; móvil 
+ausente en 127/536 y 
+58/132. Son 
+observaciones 
+descriptivas: grupos 
+pequeños y 
+porcentajes no 
+justifican causas. 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+Forma jurídica no 
+equivale a descripción 
+libre ni a Ambito. 
+Global str | None. 
+E.contacto 
+CV: telefono + email 
+ 
+CAN: telefono_1 + telefono_2; pagina_web solo 
+aporta correo si el contenido se clasifica y se 
+acuerda su reubicación. 
+ 
+CAT: tel_fon + tel_fon_m_bil + correu_electr_nic 
+CV: Normalizar componentes 
+por separado, preservando 
+originales. Revisar 0 y 
+zero@gva.es como posibles 
+marcadores; convertirlos a 
+ausencia solo tras confirmar 
+significado. Detectar 
+múltiples teléfonos/correos y 
+conservarlos con una 
+representación 
+documentada. Validar 
+sintaxis y longitudes; 
+normalización de correo 
+según política acordada. 
+ 
+CAN: Mantener teléfonos 
+como texto, tratar _U según 
+semántica confirmada y 
+revisar anomalías. Evitar 
+repetir dentro de contacto los 
+dos números idénticos sin 
+eliminar la fila. Clasificar 
+correos en pagina_web antes 
+de una reubicación 
+aprobada. Definir 
+CV: telefono: 1688 no 
+nulos, 9 ausentes; 68 
+valores '0'; existen 
+separadores y varios 
+teléfonos en un campo. 
+email: 1531 no nulos, 
+166 nulos; 873 valores 
+distintos; zero@gva.es 
+aparece 413 veces; 
+existen direcciones mal 
+formadas o múltiples. 
+Teléfono: 1604 textos 
+de nueve caracteres; 
+anomalías de 10/8/3 
+dígitos y varios 
+números en una celda 
+(p. ej. 964360002; 
+964367054). Email: 
+tres valores con 
+espacios de borde y 17 
+fuera del patrón 
+básico. El formato no 
+acredita entrega ni 
+existencia. 
+ 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+representación de varios 
+componentes. 
+ 
+CAT: Conservar los tres 
+componentes y originales; 
+acordar representación sin 
+pérdida de números, 
+extensiones, prefijos y 
+correos múltiples dentro del 
+único texto contacto. No 
+insertar puntos en dominios 
+ni separar correos 
+concatenados por conjetura. 
+Los rótulos no garantizan 
+teléfono fijo o móvil. 
+CAN: telefono_1: 728 
+únicos; completo, sin 
+_U/vacíos/espacios de 
+borde; 803 cumplen 
+(34)+9 dígitos, 7 no. 
+Un valor por cada uno 
+de los 745 NIF. 
+telefono_2: 171 únicos 
+incluido _U; 625 _U; 
+185 informados, 183 
+cumplen patrón y 2 no. 
+Un valor informado por 
+cada uno de 172 NIF; 
+igual al primero en 20 
+filas. 
+telefono_1 tiene un 
+valor por cada uno de 
+los 745 NIF; telefono_2 
+informado, por 172 
+NIF. 803/810 primeros 
+y 183/185 segundos 
+cumplen (34)+nueve 
+dígitos. Un patrón 
+sintáctico no 
+demuestra validez del 
+contacto. 
+ 
+CAT: tel_fon: 544 
+textos informados, 221 
+ausentes (28,9%) y 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+510 textos distintos. 
+504 contienen nueve 
+dígitos. Los otros 40: 
+34 multilínea, 4 con 
+extensión en una línea, 
+1 con barra en una 
+línea y 1 con prefijo 
+internacional en una 
+línea. Categorías 
+excluyentes; multilínea 
+tiene prioridad. 26 
+celdas multilínea 
+tienen dos líneas de 
+nueve dígitos exactos. 
+Otras incluyen 
+espacios, barra, 
+extensión o una 
+segunda línea de ocho 
+dígitos; se muestran 
+literalmente. 22 de los 
+504 valores de nueve 
+dígitos empiezan por 6. 
+El rótulo no garantiza 
+teléfono fijo; el formato 
+no acredita validez del 
+número. 28 textos se 
+repiten en 62 filas; 27 
+grupos tienen varias 
+direcciones y 3 varios 
+municipios. Compartir 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+número no demuestra 
+identidad de entidad. 
+Componente candidato 
+para Entidad.contacto; 
+no se separan ni 
+reescriben celdas. 
+tel_fon_m_bil: 553 
+textos informados, 212 
+ausentes (27,7%) y 
+543 textos distintos. 
+530 contienen nueve 
+dígitos; 23 son 
+multilínea. De estas, 
+22 tienen dos líneas de 
+nueve dígitos y una 
+incluye +34 en la 
+segunda línea. Ocho 
+valores de nueve 
+dígitos empiezan por 9; 
+el rótulo no acredita 
+servicio móvil. 10 
+textos se repiten en 20 
+filas; todos los grupos 
+tienen direcciones 
+distintas y 4 varios 
+municipios. En 12 filas 
+faltan ambos teléfonos. 
+Una fila tiene el mismo 
+valor informado en 
+ambos campos; tres 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+grupos de dos filas 
+comparten la pareja 
+telefónica, pero tienen 
+CIF distintos. 
+Componente candidato 
+para Entidad.contacto; 
+no se seleccionan ni 
+separan teléfonos. 
+correu_electr_nic: 730 
+textos informados, 35 
+ausentes (4,6%) y 726 
+textos distintos. 
+Categorías 
+excluyentes por celda: 
+76 cumplen el patrón 
+simple de correo único; 
+627 tienen una @ y 
+dominio sin punto; 25 
+tienen varias @; 2 no 
+tienen @. Entre los 
+627 casos está 
+acciosolidariavalles@g
+mailcom. Por 
+separado, 650 celdas 
+no contienen ningún 
+punto en todo el texto; 
+son medidas distintas. 
+De las 25 celdas con 
+varias @, 9 contienen 
+saltos de línea y 16 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+carecen de espacios. 
+Sin @: 
+sakadawaorggmailcom 
+e 
+infoarrobaproinfantsorg
+. Ya aparecen así en 
+XML. Cuatro textos se 
+repiten en ocho filas; 
+cada pareja tiene 
+nombres y direcciones 
+distintos. Tres parejas 
+tienen dos CIF 
+conocidos distintos; en 
+una falta un CIF. Una 
+pareja abarca dos 
+municipios. El patrón 
+no determina entrega 
+ni dirección prevista. 
+Candidato a 
+Entidad.contacto; no 
+se insertan puntos ni 
+separadores. 
+Detalle telefónico: 
+tel_fon tiene 34 casos 
+multilínea, cuatro con 
+extensión, uno con 
+barra y uno 
+internacional 
+(categorías 
+excluyentes); 26 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+multilínea tienen dos 
+líneas de nueve 
+dígitos. tel_fon_m_bil 
+tiene 22 multilínea con 
+dos números de nueve 
+dígitos y uno con +34 
+en la segunda línea. 22 
+números de tel_fon 
+comienzan por 6 y 
+ocho del campo móvil 
+por 9. Una fila repite 
+número en ambos 
+campos; tres parejas 
+de filas comparten 
+pareja telefónica pero 
+tienen CIF distintos. 
+Correo: las 25 celdas 
+con varias @ son 
+nueve multilínea y 16 
+sin espacios; 650 
+celdas sin ningún 
+punto es una medida 
+diferente de las 627 
+con una @ y dominio 
+sin punto. Sin @: 
+sakadawaorggmailcom 
+e 
+infoarrobaproinfantsorg
+; no reconstruir el 
+destino previsto. De 12 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+filas sin ambos 
+teléfonos, 11 
+conservan correo; el 
+registro 392 carece 
+además de 
+correo/web. De 35 sin 
+correo, 34 conservan 
+teléfono. La ausencia 
+de CIF no coincide con 
+contactos incompletos. 
+Compartir 
+teléfonos/correos no 
+demuestra identidad. 
+Global contacto es un 
+único str | None y no 
+prescribe cómo 
+serializar estos 
+componentes. 
+E.url 
+CV: — 
+ 
+CAN: pagina_web 
+ 
+CAT: web 
+CV: Sin campo; conservar 
+None salvo enriquecimiento 
+acordado. 
+ 
+CAN: Clasificar URL, email y 
+texto descriptivo; tratar _U y 
+revisar espacios 
+internos/protocolos. No 
+adivinar dominios ni aplicar 
+una corrección general. 
+Mantener contenido original y 
+CV: La fuente no 
+contiene URL ni web. 
+ 
+CAN: pagina_web: 173 
+únicos incluido _U; 619 
+_U, 191 informados, 
+172 distintos. Sin 
+vacíos ni espacios de 
+borde; 6 filas con 
+espacios internos. 
+Email, texto y hhtps://; 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+definir destino del contenido 
+no URL. 
+ 
+CAT: Correspondencia 
+candidata: preservar texto y 
+marcar esquemas 
+repetidos/host sin puntos. 
+Reparar solo tras confirmar 
+URL prevista con la fuente; 
+no reconstruir dominios por 
+conjetura. 
+un valor informado por 
+cada uno de 172 NIF. 
+Un valor informado por 
+cada uno de 172 NIF. 
+hhtps://, correos y texto 
+en el mismo campo 
+impiden considerarlo 
+URL validada. 
+ 
+CAT: web: 611 textos 
+informados, 154 
+ausentes (20,1%) y 
+607 textos distintos. 56 
+celdas repiten el 
+esquema, como 
+http://https://cecodees/. 
+En ellas urlsplit 
+devuelve https o http 
+como hostname: efecto 
+de análisis de la 
+sintaxis de origen. Los 
+611 hostnames 
+analizados carecen de 
+puntos, incluidos esos 
+56 casos. Ejemplos 
+ordinarios como 
+http://wwwigmancat 
+también carecen de 
+punto en el host literal. 
+No se establecen 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+dominios previstos. 
+Tres URLs se repiten 
+en siete filas. Quepo y 
+Yamuna tienen CIF 
+conocidos distintos; 
+http://wwwsolidariesorg 
+abarca tres nombres y 
+dos municipios, con un 
+CIF ausente. Dos 
+registros Yamuna 
+comparten los cuatro 
+contactos informados, 
+pero difieren en 
+registro, nombre, CIF, 
+naturaleza y texto de 
+dirección. Sugiere 
+revisar una posible 
+relación, no fusionar 
+automáticamente. 
+Candidato a 
+Entidad.url; no se 
+reparan 
+esquemas/dominios ni 
+se comprueba DNS o 
+disponibilidad. 
+Los dos registros 
+Yamuna comparten 
+teléfono, móvil, correo 
+y web, pero difieren en 
+registro, nombre, CIF, 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+naturaleza y dirección. 
+Quepo/Yamuna tienen 
+CIF conocidos 
+distintos; 
+wwwsolidariesorg 
+abarca tres nombres y 
+dos municipios con un 
+CIF ausente. La 
+coincidencia no 
+justifica fusionar. No se 
+ha comprobado DNS, 
+existencia o 
+disponibilidad en 
+ninguna fuente. El 
+nombre canónico de 
+Python es url (URL en 
+el informe anterior); str 
+| None. 
+E.en_localidad 
+CV: cod_ine_mun + municipio + provincia 
+ 
+CAN: direccion_municipio_id + 
+direccion_municipio_nombre + 
+direccion_provincia_id + 
+direccion_provincia_nombre 
+ 
+CAT: municipi; codi_postal solo como contexto 
+de revisión, no como código municipal. 
+CV: Construir Localidad con 
+cod_ine_mun textual de 
+cinco caracteres, municipio y 
+el objeto Provincia derivado 
+según L.en_provincia. 
+Asociar cada entidad a ese 
+objeto; no es una unión entre 
+fuentes. 
+ 
+CAN: Construcción candidata 
+de Localidad/Provincia tras 
+CV: 333 códigos y 333 
+municipios, relación 
+uno a uno, completos; 
+provincias 
+consistentes. La 
+construcción reúne 
+campos de CV y no 
+fusiona registros. 
+ 
+CAN: 90 códigos, 83 
+nombres conocidos y 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+validar códigos y resolver 
+marcadores. Definir 
+representación de varias 
+sedes/localidades por 
+organización; tratar las ocho 
+filas incompletas mediante 
+enriquecimiento, cuarentena 
+o cambio de modelo 
+acordado. 
+ 
+CAT: No se puede construir 
+el objeto obligatorio completo 
+solo con campos explícitos. 
+Usar municipi como 
+candidato de nombre; 
+obtener código municipal y 
+Provincia únicamente 
+mediante enriquecimiento 
+verificado y acordado. 
+siete códigos sin 
+nombre en ocho filas; 
+esas ocho tampoco 
+tienen provincia 
+conocida. Codificación 
+municipal no validada. 
+No tomar _U como 
+localidad ni escoger 
+arbitrariamente una 
+sede. Isla aporta 
+contexto: 
+direccion_isla_id: 7 
+códigos y _U; 40 _U: 
+32 filas de provincia 
+peninsular y 8 de 
+provincia desconocida. 
+Sin nulos, vacíos ni 
+espacios de borde 
+detectados. 
+direccion_isla_nombre: 
+7 nombres y _U; 
+código–nombre 
+uno-a-uno. _U puede 
+ser no aplicable o 
+desconocido. Sin 
+nulos, vacíos ni 
+espacios de borde 
+detectados. 
+ 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+CAT: Solo hay nombre 
+municipal: faltan 
+Localidad.codigo y 
+Provincia.codigo/nomb
+re, y no existe relación 
+provincial explícita. 
+Python exige 
+en_localidad: 
+Localidad, sin None ni 
+valor por defecto. El 
+postal no sustituye 
+código municipal; no 
+fabricar objetos 
+completos ni 
+relaciones provinciales. 
+L.codigo 
+CV: cod_ine_mun 
+ 
+CAN: direccion_municipio_id 
+ 
+CAT: —; municipi solo sería apoyo para un 
+catálogo externo. 
+CV: Convertir a texto de 
+cinco caracteres y completar 
+el cero inicial según la 
+codificación INE identificada. 
+ 
+CAN: Convertir identificador 
+de origen a texto para 
+codigo. Validar su sistema de 
+codificación antes de rellenar 
+ceros, equipararlo al INE o 
+cruzarlo con otras fuentes. 
+ 
+CAT: Sin código municipal 
+explícito. Enriquecimiento 
+CV: cod_ine_mun: 
+1697 valores, 333 
+códigos; 489 aparecen 
+con 4 dígitos por 
+pérdida del cero inicial. 
+1208 valores tienen 
+cinco dígitos y 489 
+cuatro; los 333 códigos 
+corresponden uno a 
+uno con municipio. 
+Identificador, no 
+magnitud. 
+ 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+externo pendiente; no usar 
+codi_postal como código de 
+localidad. 
+CAN: 
+direccion_municipio_id: 
+int64; 90 códigos; un 
+nombre y un valor 
+provincial por código, 
+incluidos marcadores; 
+codificación no 
+verificada. Sin nulos, 
+vacíos ni espacios de 
+borde detectados. 
+El JSON literal 
+almacena 
+identificadores como 
+texto; int64 es la 
+inferencia del 
+notebook. No se 
+confirmó equivalencia 
+con códigos INE. Siete 
+códigos no tienen 
+nombre recuperable en 
+esta fuente. 
+ 
+CAT: Solo hay municipi 
+y código postal. Se 
+necesita 
+correspondencia 
+municipal oficial 
+verificada; nombres 
+concatenados y 
+asociaciones postales 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+requieren revisión. 
+Global codigo: str 
+obligatorio. 
+L.nombre 
+CV: municipio 
+ 
+CAN: direccion_municipio_nombre 
+ 
+CAT: municipi 
+CV: Copiar el nombre 
+municipal; conservar 
+nombres bilingües y acordar 
+política de normalización sin 
+pérdida. 
+ 
+CAN: Copiar nombres 
+conocidos. Resolver _U 
+como marcador antes de 
+construir la relación 
+obligatoria; no tratarlo como 
+nombre de un único 
+municipio. 
+ 
+CAT: Copiar texto original 
+como candidato; no 
+reconstruir espacios ni 
+afirmar equivalencia oficial 
+sin evidencia. 
+CV: municipio: 1697 
+valores; 333 nombres 
+distintos; relación 
+uno-a-uno con 
+cod_ine_mun. 
+Sin espacios de borde; 
+nombres de 3–47 
+caracteres. Los 
+nombres bilingües 
+largos son plausibles y 
+no se consideran 
+automáticamente 
+anomalías. 
+ 
+CAN: 
+direccion_municipio_n
+ombre: 83 nombres y 
+_U; 7 códigos sin 
+nombre en 8 filas; 
+tampoco tienen 
+provincia conocida; 
+nombres conocidos 
+uno-a-uno con código. 
+Sin nulos, vacíos ni 
+espacios de borde 
+detectados. 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+83 nombres conocidos 
+corresponden uno a 
+uno con código; _U 
+agrupa siete códigos y 
+ocho filas. Esos 
+códigos tampoco 
+tienen provincia 
+conocida en el archivo. 
+ 
+CAT: municipi: 765 
+valores informados y 
+113 etiquetas distintas. 
+Barcelona aparece 428 
+veces. Sin caracteres 
+de espacio. Nombres 
+compuestos como 
+SantCugatdelVallès 
+concatenan palabras; 
+esto no afecta a 
+nombres de una 
+palabra como 
+Barcelona. Se 
+muestran longitudes 
+extremas y 
+multiplicidad de 
+códigos y prefijos 
+postales; no se 
+asignan provincias 
+mediante prefijos. 112 
+municipios tienen un 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+prefijo postal literal; 
+VilanovailaGeltrú tiene 
+dos: 00 (una fila, 
+00800) y 08 (dos filas, 
+08800). Es una 
+discrepancia interna 
+para revisión; no se 
+establece aquí el 
+código correcto. 
+Candidato a 
+Localidad.nombre 
+mediante 
+Entidad.en_localidad. 
+Faltan código 
+municipal, 
+código/nombre de 
+provincia y relación 
+provincial explícita. No 
+se establece exactitud 
+geográfica ni 
+equivalencia con 
+etiquetas municipales 
+oficiales. 
+112 municipios tienen 
+un prefijo postal literal; 
+VilanovailaGeltrú tiene 
+00 (una fila con 00800) 
+y 08 (dos con 08800). 
+Discrepancia interna, 
+sin establecer código 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+correcto ni asignar 
+provincia. Global 
+nombre: str obligatorio. 
+L.en_provincia 
+CV: cod_ine_mun + provincia 
+ 
+CAN: direccion_provincia_id + 
+direccion_provincia_nombre 
+ 
+CAT: —; no hay provincia explícita. 
+CV: Construir Provincia 
+tomando los dos primeros 
+dígitos de cod_ine_mun 
+previamente normalizado a 
+cinco caracteres y copiando 
+provincia. Asociar la 
+localidad al objeto resultante. 
+ 
+CAN: Construcción candidata 
+de Provincia con código 
+textual y nombre conocido. 
+Resolver _U e incompletitud 
+antes de asignar la relación 
+obligatoria. 
+ 
+CAT: No construir Provincia 
+desde una suposición o 
+prefijo postal no validado. 
+Acordar enriquecimiento 
+verificado o representación 
+alternativa del modelo. 
+CV: Coherencia 
+observada: 03 → 
+Alacant/Alicante; 12 → 
+Castelló/Castellón; 46 
+→ València/Valencia. 
+Las 33 comarcas 
+pertenecen a una 
+provincia y cada 
+municipio a una 
+comarca. 
+ 
+CAN: Código–nombre 
+provincial uno a uno 
+entre 12 provincias 
+conocidas; ocho filas 
+tienen _U en ambos 
+campos. Ninguna 
+provincia conocida se 
+puede recuperar para 
+los siete códigos 
+municipales afectados 
+usando este archivo 
+solo. 
+ 
+CAT: Faltan 
+código/nombre 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+provincial y relación 
+explícita. codi_postal y 
+municipi pueden 
+aportar contexto para 
+revisión, pero no 
+completan la relación. 
+Global en_provincia: 
+Provincia obligatorio, 
+sin None ni valor por 
+defecto. 
+P.codigo 
+CV: cod_ine_mun 
+ 
+CAN: direccion_provincia_id 
+ 
+CAT: — 
+CV: Normalizar código 
+municipal a texto de cinco 
+caracteres y extraer los dos 
+primeros. 
+ 
+CAN: Preservar código 
+textual y ceros iniciales (p. ej. 
+06). Validar sistema y tratar 
+_U antes de integrar. 
+ 
+CAT: Sin campo provincial 
+explícito; no derivar un 
+código definitivo del prefijo 
+postal sin validación externa. 
+CV: 03, 12 y 46 son 
+coherentes con 
+provincia en los 1697 
+registros. cod_ine_mun 
+representa municipio; 
+su prefijo proporciona 
+el candidato provincial 
+documentado. 
+ 
+CAN: 
+direccion_provincia_id: 
+Texto; 12 códigos más 
+_U en 8 filas; incluye 
+06. Sin nulos, vacíos ni 
+espacios de borde 
+detectados. 
+Códigos y nombres 
+provinciales tienen 
+correspondencia uno a 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+uno; _U no es un 
+código válido conocido. 
+ 
+CAT: Los códigos 
+postales tienen 
+discrepancias como 
+00800/08800 en el 
+mismo municipi; no 
+acreditar provincia 
+mediante esos prefijos. 
+Global codigo: str 
+obligatorio. 
+P.nombre 
+CV: provincia 
+ 
+CAN: direccion_provincia_nombre 
+ 
+CAT: — 
+CV: Copiar nombre bilingüe 
+original; acordar posterior 
+normalización 
+valenciano/castellano. 
+ 
+CAN: Copiar nombres 
+conocidos; resolver _U y 
+validar antes de construir 
+Provincia y 
+Localidad.en_provincia. 
+ 
+CAT: Sin campo explícito; 
+cualquier correspondencia 
+municipal/provincial requiere 
+enriquecimiento verificado. 
+CV: provincia: 3 
+valores bilingües; sin 
+ausentes; coherente 
+con cod_ine_mun y 
+comarca. 
+comarca: 33 valores; 
+cada municipio 
+pertenece a una 
+comarca y cada 
+comarca a una 
+provincia. 
+pobtotal: 1665 valores 
+no nulos, 32 ausentes; 
+un único valor por 
+municipio y 
+cod_ine_mun. 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+Alacant/Alicante: 489 
+filas; 
+Castelló/Castellón: 
+324; València/Valencia: 
+884. Coherencia 
+interna con 
+INE/comarca no 
+sustituye una 
+validación geográfica 
+externa. comarca y 
+pobtotal son metadatos 
+territoriales sin atributo 
+propio; pobtotal 
+pertenece a localidad, 
+no a Entidad. 
+ 
+CAN: 
+direccion_provincia_no
+mbre: 12 nombres más 
+_U en 8 filas; 
+código–nombre 
+uno-a-uno. Sin nulos, 
+vacíos ni espacios de 
+borde detectados. 
+Sin espacios de borde, 
+vacíos ni nulos 
+técnicos; los 
+marcadores 
+representan 
+
+Dato esquema global 
+Dato(s) esquema origen 
+Transformación(es) 
+Comentarios 
+incompletitud 
+semántica por revisar. 
+ 
+CAT: No hay nombre 
+provincial ni relación 
+provincial explícita. No 
+inventar provincia a 
+partir del nombre o de 
+la pertenencia al 
+registro catalán. Global 
+nombre: str obligatorio. 
+ 

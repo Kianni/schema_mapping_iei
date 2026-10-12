@@ -1,0 +1,26 @@
+{
+  "rows": 27,
+  "ambito_rows": 12,
+  "schema_fields": 16,
+  "source_rows": [
+    1697,
+    810,
+    765
+  ],
+  "characters": 45583,
+  "template_grid_preserved": false,
+  "template_landscape_preserved": true,
+  "audit_applied": true,
+  "column_widths_pt": [
+    108,
+    150,
+    185,
+    255.8
+  ],
+  "headers": [
+    "Dato esquema global",
+    "Dato(s) esquema origen",
+    "Transformación(es)",
+    "Comentarios"
+  ]
+}

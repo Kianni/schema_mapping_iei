@@ -1,0 +1,49 @@
+{
+  "google_doc_url": "https://docs.google.com/document/d/1CUuUvST6LCZ_D6c5T9vwMowplZaUJ85hiUXcLqOxCHU/edit?usp=drivesdk",
+  "folder_id": "1MnwsrKwoujhqL3lX5Ts_CzB2XKut4fKK",
+  "data_rows": 27,
+  "ambito_rows": 12,
+  "schema_fields": 16,
+  "native_table_rows": 28,
+  "native_table_columns": 4,
+  "native_cell_text_mismatches": 0,
+  "pdf_pages_before_review": 53,
+  "pdf_pages": 29,
+  "pages_with_repeated_header": 29,
+  "missing_field_labels": [],
+  "text_outside_pages": [],
+  "missing_rendered_characters": {},
+  "extra_rendered_characters": {},
+  "source_counts": {
+    "CV": {
+      "rows": 1697,
+      "fields": 21
+    },
+    "CAN": {
+      "rows": 810,
+      "fields": 20
+    },
+    "CAT": {
+      "rows": 765,
+      "fields": 11
+    }
+  },
+  "independent_source_audits_completed": [
+    "CV",
+    "CAN",
+    "CAT"
+  ],
+  "corrected_inaccuracies": [
+    "CV id uniqueness does not imply consecutive numbering",
+    "CV leading municipal zeroes exist in raw CSV; loss is in numeric loading"
+  ],
+  "semantic_clarifications": [
+    "partial CV INCLUSION_SOCIAL mapping",
+    "missing centre identifiers for all CV INFANCIA/MUJERES rows",
+    "CAN literal address variants do not prove separate premises/localities",
+    "CAN subarea group denominator excludes _U",
+    "CAT phone counts are cells, not distinct numbers",
+    "CAT CIF/contact missingness is not equivalent",
+    "pandas inferred types differ from literal source types"
+  ]
+}

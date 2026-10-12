@@ -1,0 +1,269 @@
+[
+  {
+    "field": "E.cod_entidad",
+    "column": "comentarios",
+    "before": "id: int64; completo; 1697 valores únicos y secuenciales.",
+    "after": "id: completo; 1697 valores únicos y crecientes en el intervalo 1–1713, con 16 números ausentes; identifica filas, no centros."
+  },
+  {
+    "field": "E.cod_entidad",
+    "column": "transformaciones",
+    "before": "CV: Convertir cada ni_centro no ausente, matemáticamente entero, de float a texto sin sufijo decimal. Acordar tratamiento de los 32 códigos ausentes; no sustituir automáticamente por id.",
+    "after": "CV: Leer ni_centro como identificador textual, preservando el literal del CSV. Si ya se cargó como float, convertir los valores informados, matemáticamente enteros, a texto sin sufijo decimal. Acordar tratamiento de los 32 códigos ausentes; id identifica filas y no sustituye automáticamente al código de centro."
+  },
+  {
+    "field": "E.cod_entidad",
+    "column": "comentarios",
+    "before": "No eliminar filas por NIF o registro: pueden aportar sedes, direcciones, áreas y subáreas distintas.",
+    "after": "No eliminar filas por NIF o registro: pueden aportar direcciones literales, áreas y subáreas distintas. Cinco NIF tienen dos tuplas distintas de componentes de dirección; cuatro tienen dos textos de calle. Algunas diferencias son de formato o de reparto de componentes y no demuestran sedes físicas distintas. Cada NIF y cada registro tiene un único código municipal en este archivo."
+  },
+  {
+    "field": "E.cod_entidad",
+    "column": "comentarios",
+    "before": "Unicidad local no acredita identidad entre fuentes. Ambos grupos de CIF repetido difieren también en código postal, municipio, móvil y correo; no se determina relación jurídica o error.",
+    "after": "Unicidad local no acredita identidad entre fuentes."
+  },
+  {
+    "field": "L.codigo",
+    "column": "transformaciones",
+    "before": "CV: Convertir a texto de cinco caracteres y completar el cero inicial según la codificación INE identificada.",
+    "after": "CV: Leer cod_ine_mun como texto y preservar los cinco caracteres ya presentes en el CSV. Si se trabaja con una importación numérica anterior, completar la representación a cinco caracteres con cero inicial."
+  },
+  {
+    "field": "L.codigo",
+    "column": "comentarios",
+    "before": "CV: cod_ine_mun: 1697 valores, 333 códigos; 489 aparecen con 4 dígitos por pérdida del cero inicial.\n1208 valores tienen cinco dígitos y 489 cuatro; los 333 códigos corresponden uno a uno con municipio. Identificador, no magnitud.",
+    "after": "CV: El CSV literal contiene 1697 códigos de cinco caracteres, 333 distintos y ninguno ausente. La inferencia int64 de pandas pierde el cero inicial en 489 códigos con prefijo 03: en esa representación numérica quedan 489 valores de cuatro dígitos y 1208 de cinco. Los 333 códigos y municipios tienen relación uno a uno. El código es un identificador, no una magnitud; conservar texto evita la pérdida de ceros."
+  },
+  {
+    "field": "L.codigo",
+    "column": "transformaciones",
+    "before": "CAN: Convertir identificador de origen a texto para codigo. Validar su sistema de codificación antes de rellenar ceros, equipararlo al INE o cruzarlo con otras fuentes.",
+    "after": "CAN: Preservar direccion_municipio_id como texto: el JSON ya contiene cadenas de cinco caracteres. Convertir a texto solo si se usa una carga numérica anterior. Validar el sistema antes de equipararlo al INE o de cruzarlo entre fuentes; no aplicar relleno por conjetura."
+  },
+  {
+    "field": "E.ambito = \"MAYORES\"",
+    "column": "comentarios",
+    "before": "CV tiene 12 centros con varios sectores (10 con dos y dos con tres);",
+    "after": "Entre los 1645 códigos ni_centro informados, CV tiene 12 con varios sectores (10 con dos y dos con tres);"
+  },
+  {
+    "field": "E.ambito = \"MAYORES\"",
+    "column": "comentarios",
+    "before": "Sus 33 grupos NIF–área con varias subáreas se distribuyen en 29 con dos, tres con tres y uno con seis (otros 341 tienen una).",
+    "after": "Tras excluir _U, CAN tiene 374 grupos NIF–área con subáreas conocidas: 341 con una, 29 con dos, tres con tres y uno con seis; 33 grupos tienen varias. Otros 391 grupos contienen solo _U, para un total de 765 grupos NIF–área. Ningún grupo mezcla subáreas conocidas y _U."
+  },
+  {
+    "field": "E.ambito = \"INFANCIA_Y_JUVENTUD\"",
+    "column": "comentarios",
+    "added": "All category rows lack ni_centro."
+  },
+  {
+    "field": "E.ambito = \"MUJER\"",
+    "column": "comentarios",
+    "added": "All category rows lack ni_centro."
+  },
+  {
+    "field": "E.ambito = \"INCLUSION_SOCIAL\"",
+    "column": "transformaciones",
+    "before": "CV: Mapear la categoría explícita a INCLUSION_SOCIAL.",
+    "after": "CV: Correspondencia parcial propuesta hacia INCLUSION_SOCIAL, pendiente de aceptar el criterio de integración; conservar el sector original para no perder su alcance."
+  },
+  {
+    "field": "E.ambito = \"INCLUSION_SOCIAL\"",
+    "column": "comentarios",
+    "before": "Mejor correspondencia dentro del enum global actual.",
+    "after": "Correspondencia parcial propuesta dentro del enum: el sector también incluye población en general, por lo que no es una equivalencia exacta con inclusión social."
+  },
+  {
+    "field": "E.ambito = \"EMPLEO_E_INSERCION_LABORAL\"",
+    "column": "transformaciones",
+    "before": "CAN: Correspondencia candidata, pendiente de revisión semántica para EMPLEO_E_INSERCION_LABORAL. Usar la pareja área–subárea, sin asignar por el área genérica sola. No equiparar todo centro ocupacional con inserción laboral ni todo Varios / B con empleo.",
+    "after": "CAN: Evaluar Centros Ocupacionales por su área y Varios / B por la pareja área–subárea. Ambos son candidatos pendientes de revisión para EMPLEO_E_INSERCION_LABORAL. No equiparar todo centro ocupacional con inserción laboral ni toda la categoría B con empleo."
+  },
+  {
+    "field": "E.ambito = \"SALUD_Y_ATENCION_SOCIOSANITARIA\"",
+    "column": "transformaciones",
+    "before": "CAN: Correspondencia candidata, pendiente de revisión semántica para SALUD_Y_ATENCION_SOCIOSANITARIA. Usar la pareja área–subárea, sin asignar por el área genérica sola.",
+    "after": "CAN: Evaluar Drogodependencia por su área; Varios / H y Voluntariado / 3 por la pareja área–subárea. Son candidatos de alcance distinto, pendientes de revisión para SALUD_Y_ATENCION_SOCIOSANITARIA. No asignar este ámbito a todo Varios o Voluntariado."
+  },
+  {
+    "field": "E.direccion",
+    "column": "comentarios",
+    "before": "Una organización puede tener varias direcciones; no escoger una arbitrariamente.",
+    "after": "Cinco NIF tienen dos tuplas literales distintas de componentes de dirección (740 tienen una); cuatro presentan distintos textos de calle. Las diferencias pueden ser de formato o de reparto de componentes: no demuestran sedes físicas distintas. Cada NIF conserva un único código municipal. No escoger una variante arbitrariamente."
+  },
+  {
+    "field": "E.direccion",
+    "column": "transformaciones",
+    "before": "Definir representación de varias sedes/direcciones por NIF.",
+    "after": "Definir representación de variantes/direcciones literales por NIF y confirmar si corresponden a sedes distintas."
+  },
+  {
+    "field": "E.en_localidad",
+    "column": "transformaciones",
+    "before": "Definir representación de varias sedes/localidades por organización;",
+    "after": "En este archivo, cada NIF y cada registro tiene un único código municipal. Acordar cómo representar variantes de dirección y posibles sedes futuras sin afirmar multiplicidad municipal observada;"
+  },
+  {
+    "field": "E.en_localidad",
+    "column": "comentarios",
+    "before": "No tomar _U como localidad ni escoger arbitrariamente una sede.",
+    "after": "No tomar _U como localidad. Hay variantes literales de dirección, pero no varios códigos municipales por NIF o registro; las sedes físicas no están identificadas explícitamente."
+  },
+  {
+    "field": "E.descripcion",
+    "column": "comentarios",
+    "before": "21 organizaciones tienen dos valores;",
+    "after": "21 grupos de nombres entidad tienen dos valores;"
+  },
+  {
+    "field": "E.descripcion",
+    "column": "comentarios",
+    "before": "max: 147 valores,",
+    "after": "max: 147 valores distintos,"
+  },
+  {
+    "field": "E.descripcion",
+    "column": "comentarios",
+    "before": "tipo_centro tiene 64 categorías; 1636 centros tienen un tipo y nueve varios",
+    "after": "tipo_centro tiene 64 categorías; entre los 1645 códigos ni_centro informados, 1636 tienen un tipo y nueve varios"
+  },
+  {
+    "field": "E.contacto",
+    "column": "comentarios",
+    "before": "Teléfono: 1604 textos de nueve caracteres; anomalías de 10/8/3 dígitos y varios números en una celda (p. ej. 964360002; 964367054).",
+    "after": "Teléfono: 1604 textos de nueve caracteres; valores de 10 u ocho dígitos y celdas con varios números (p. ej. 964360002; 964367054) requieren revisión. El formato corto 012 aparece en tres filas y no debe declararse erróneo solo por su longitud."
+  },
+  {
+    "field": "E.contacto",
+    "column": "comentarios",
+    "before": "telefono_1 tiene un valor por cada uno de los 745 NIF; telefono_2 informado, por 172 NIF. 803/810 primeros y 183/185 segundos cumplen (34)+nueve dígitos. Un patrón sintáctico no demuestra validez del contacto.",
+    "after": "Los nueve valores fuera del patrón presentan longitudes inesperadas o un prefijo de país repetido, como (34)+34650393946. Un patrón sintáctico no demuestra validez, existencia ni disponibilidad del contacto."
+  },
+  {
+    "field": "E.contacto",
+    "column": "comentarios",
+    "change": "Removed duplicate CAT telephone/email facts; added exact CIF/contact overlap counts."
+  },
+  {
+    "field": "E.url",
+    "column": "comentarios",
+    "before": "Un valor informado por cada uno de 172 NIF. hhtps://, correos y texto en el mismo campo impiden considerarlo URL validada.",
+    "after": "Un valor informado por cada uno de 172 NIF. Las seis filas con espacios internos son dos referencias web y cuatro descripciones. Hay un email distinto, felicesconnarices@hotmail.com, además de texto y hhtps://; el campo completo no puede considerarse URL validada."
+  },
+  {
+    "field": "E.url",
+    "column": "comentarios",
+    "before": "Los dos registros Yamuna comparten teléfono, móvil, correo y web, pero difieren en registro, nombre, CIF, naturaleza y dirección. Quepo/Yamuna tienen CIF conocidos distintos; wwwsolidariesorg abarca tres nombres y dos municipios con un CIF ausente. La coincidencia no justifica fusionar.",
+    "after": "La coincidencia de contactos no justifica fusionar registros."
+  },
+  {
+    "field": "E.nombre",
+    "column": "comentarios",
+    "before": "Se muestran longitudes extremas y finales para inspección; estas comprobaciones no demuestran truncamiento.",
+    "after": "La inspección de longitudes y finales de nombres en el notebook no demuestra truncamiento."
+  },
+  {
+    "field": "E.direccion",
+    "column": "comentarios",
+    "before": "Las tablas comparan los demás campos.",
+    "after": "La comparación de los demás campos está documentada en notebooks/entitats_xml.ipynb."
+  },
+  {
+    "field": "E.codigo_postal",
+    "column": "comentarios",
+    "before": "Se muestra contexto de nombre y dirección para revisión.",
+    "after": "El notebook documenta el contexto de nombre y dirección para revisar esas asociaciones."
+  },
+  {
+    "field": "E.descripcion",
+    "column": "comentarios",
+    "before": "Se muestran tamaños y porcentajes por grupo.",
+    "after": "Los tamaños y porcentajes por naturaleza son observaciones descriptivas."
+  },
+  {
+    "field": "E.contacto",
+    "column": "comentarios",
+    "before": "Otras incluyen espacios, barra, extensión o una segunda línea de ocho dígitos; se muestran literalmente.",
+    "after": "Otras incluyen espacios, barra, extensión o una segunda línea de ocho dígitos."
+  },
+  {
+    "field": "L.nombre",
+    "column": "comentarios",
+    "before": "Se muestran longitudes extremas y multiplicidad de códigos y prefijos postales; no se asignan provincias mediante prefijos.",
+    "after": "La multiplicidad de códigos y prefijos postales no acredita provincia ni exactitud geográfica."
+  },
+  {
+    "field": "E.nombre",
+    "column": "comentarios",
+    "before": "No se demuestra truncamiento mediante longitudes/extremos. Campo global str obligatorio; unicidad en un archivo no garantiza identidad universal.",
+    "after": "Campo global str obligatorio; unicidad en un archivo no garantiza identidad universal."
+  },
+  {
+    "field": "E.nombre",
+    "column": "comentarios",
+    "before": "Filas 157, 319, 457 con finales posiblemente truncados, 99–100 caracteres, confirmados en JSON; errata posible Otrtas.\nFrecuencia máxima: siete filas. Longitudes sospechosas en índices 157/319/457: 99/100/100, también en JSON;",
+    "after": "Frecuencia máxima: siete filas. Posibles truncamientos en índices 157/319/457: 99/100/100 caracteres, confirmados en JSON; posible errata Otrtas;"
+  },
+  {
+    "field": "E.direccion",
+    "column": "comentarios",
+    "before": "Siete parejas de dirección compartida tienen CIF distintos y en tres falta uno; no deduplicar por dirección.",
+    "after": "No deduplicar por dirección compartida."
+  },
+  {
+    "field": "E.codigo_postal",
+    "column": "comentarios",
+    "before": "No se restauran ceros ni se cambian códigos.",
+    "after": ""
+  },
+  {
+    "field": "E.descripcion",
+    "column": "comentarios",
+    "before": "Asociaciones: 536; fundaciones: 132. CIF ausente en 73/536 asociaciones y 9/132 fundaciones; móvil ausente en 127/536 y 58/132. Son observaciones descriptivas: grupos pequeños y porcentajes no justifican causas.",
+    "after": "Los porcentajes observados no justifican conclusiones causales."
+  },
+  {
+    "field": "E.contacto",
+    "column": "comentarios",
+    "before": "504 contienen nueve dígitos.",
+    "after": "504 celdas contienen exactamente un número de nueve dígitos; no son 504 números únicos."
+  },
+  {
+    "field": "E.contacto",
+    "column": "comentarios",
+    "before": "530 contienen nueve dígitos;",
+    "after": "530 celdas contienen exactamente un número de nueve dígitos;"
+  },
+  {
+    "field": "E.contacto",
+    "column": "comentarios",
+    "before": "Otras incluyen espacios, barra, extensión o una segunda línea de ocho dígitos.",
+    "after": "Las otras ocho celdas multilínea incluyen espacios, barra, extensión o una segunda línea de ocho dígitos."
+  },
+  {
+    "field": "E.contacto",
+    "column": "comentarios",
+    "before": "22 de los 504 valores de nueve dígitos empiezan por 6.",
+    "after": "22 de esas 504 celdas empiezan por 6."
+  },
+  {
+    "field": "E.contacto",
+    "column": "comentarios",
+    "before": "Ocho valores de nueve dígitos empiezan por 9;",
+    "after": "Ocho de las 530 celdas de nueve dígitos empiezan por 9;"
+  },
+  {
+    "field": "E.url",
+    "column": "comentarios",
+    "before": "En ellas urlsplit devuelve https o http como hostname: efecto de análisis de la sintaxis de origen.",
+    "after": "En esos 56 casos, urlsplit devuelve https como hostname en 55 y http en uno: efecto de la sintaxis, no identificación de dominios reales."
+  },
+  {
+    "field": "L.nombre",
+    "column": "comentarios",
+    "before": "112 municipios tienen un prefijo postal literal; VilanovailaGeltrú tiene 00 (una fila con 00800) y 08 (dos con 08800). Discrepancia interna, sin establecer código correcto ni asignar provincia. Global nombre: str obligatorio.",
+    "after": "La discrepancia postal no establece el código correcto ni permite asignar provincia. Global nombre: str obligatorio."
+  }
+]
